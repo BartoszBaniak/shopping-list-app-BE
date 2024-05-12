@@ -1,47 +1,60 @@
 package com.shoppinglist.springboot.user;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "app_user")
-public class User
-{
+@Table(name = "app_user", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "user_email_unique",
+                columnNames = "email"
+        )
+})
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false)
     private Integer id;
 
-    @Column(name = "firstname", nullable = false)
+    @Column(name = "firstName", nullable = false)
     private String firstname;
 
-    @Column(name = "lastname", nullable = false)
+    @Column(name = "lastName", nullable = false)
     private String lastname;
 
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "address", nullable = false)
-    private String address;
+    @Column(name = "password", nullable = false)
+    private String password;
+    @Column(name = "birthDate", nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthDate;
 
-    @Column(name = "phoneNumber", nullable = false)
-    private String phoneNumber;
+    @Column(name = "isActive", nullable = false, columnDefinition = "boolean default false")
+    private boolean isActive;
 
     public User() {
     }
 
-    public User(String firstname, String lastname, String email, String address, String phoneNumber)
-    {
+    public User(String firstname, String lastname, String email, String password, LocalDate birthDate, boolean isActive) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
+        this.password = password;
+        this.birthDate = birthDate;
+        this.isActive = isActive;
     }
 
     public Integer getId() {
         return id;
+    }
+
+    public void setId(int i) {
+        this.id = i;
     }
 
     public String getFirstname() {
@@ -68,38 +81,47 @@ public class User
         this.email = email;
     }
 
-    public String getAddress() {
-        return address;
+    public String getPassword() {
+        return password;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public LocalDate getBirthDate() {
+        return birthDate;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User customer = (User) o;
-        return Objects.equals(id, customer.id) &&
-                Objects.equals(firstname, customer.firstname) &&
-                Objects.equals(lastname, customer.lastname) &&
-                Objects.equals(email, customer.email) &&
-                Objects.equals(address, customer.address) &&
-                Objects.equals(phoneNumber, customer.phoneNumber);
+        User user = (User) o;
+        return Objects.equals(id, user.id) &&
+                Objects.equals(firstname, user.firstname) &&
+                Objects.equals(lastname, user.lastname) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(birthDate, user.birthDate) &&
+                Objects.equals(isActive, user.isActive);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstname, lastname, email, address, phoneNumber);
+        return Objects.hash(id, firstname, lastname, email, password, birthDate, isActive);
     }
 
     @Override
@@ -109,13 +131,9 @@ public class User
                 ", firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", email='" + email + '\'' +
-                ", address='" + address + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
+                ", password='" + password + '\'' +
+                ", birthDate='" + birthDate + '\'' +
+                ", isActive=" + isActive +
                 '}';
-    }
-
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 }
