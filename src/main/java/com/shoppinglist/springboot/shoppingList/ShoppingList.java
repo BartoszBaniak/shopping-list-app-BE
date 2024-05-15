@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.List;
+
+import com.shoppinglist.springboot.user.User;
 
 @Entity
 @Table(name = "shopping_lists")
@@ -11,18 +14,13 @@ public class ShoppingList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
 
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "shopping_list_id")
-    private Set<ProduktZIloscia> Produkty = new HashSet<>();
+    @ManyToOne
+    private User user;
 
-    public void addProduktZIloscia(ProduktZIloscia produkty) {
-        Produkty.add(produkty);
-    }
-
-    public void removeProduktZIloscia(ProduktZIloscia produkty) {
-        Produkty.remove(produkty);
-    }
+    @OneToMany(mappedBy = "shoppingList")
+    private List < ShoppingListItem > items;
 
     public Long getId() {
         return id;
@@ -32,12 +30,28 @@ public class ShoppingList {
         this.id = id;
     }
 
-    public Set<ProduktZIloscia> getProdukty() {
-        return new HashSet<>(Produkty);
+    public String getName() {
+        return name;
     }
 
-    public void setProdukty(Set<ProduktZIloscia> produkty) {
-        this.Produkty = produkty;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List < ShoppingListItem > getItems() {
+        return items;
+    }
+
+    public void setItems(List < ShoppingListItem > items) {
+        this.items = items;
     }
 
     @Override

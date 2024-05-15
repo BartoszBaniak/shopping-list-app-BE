@@ -37,8 +37,7 @@ public class User {
     @Column(name = "isActive", nullable = false, columnDefinition = "boolean default false")
     private boolean isActive;
 
-    public User() {
-    }
+    public User() {}
 
     public User(String firstname, String lastname, String email, String password, LocalDate birthDate, boolean isActive) {
         this.firstname = firstname;

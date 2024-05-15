@@ -4,6 +4,7 @@ import com.shoppinglist.springboot.exceptions.DuplicateResourceException;
 import com.shoppinglist.springboot.exceptions.NotValidResourceException;
 import com.shoppinglist.springboot.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class UserService
-{
+@Service
+public class UserService {
     private final UserDAO userDAO;
 
     @Autowired
@@ -21,7 +22,7 @@ public class UserService
         this.userDAO = userDAO;
     }
 
-    public List<User> getAllUsers() {
+    public List < User > getAllUsers() {
         return userDAO.getAllUsers();
     }
 
@@ -31,43 +32,37 @@ public class UserService
                         new ResourceNotFoundException("User with id [%s] not found".formatted(id))
                 );
     }
-    public ResponseEntity<?> passwordValidator(String password) {
-        if (password.length() < 8 || password.length() > 32)
-        {
+    public ResponseEntity < ? > passwordValidator(String password) {
+        if (password.length() < 8 || password.length() > 32) {
             Error error = new Error("Weryfikacja", "password", "Password length should be between 8 and 32 characters");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
-        if (!password.matches(".*[a-z].*"))
-        {
+        if (!password.matches(".*[a-z].*")) {
             Error error = new Error("Weryfikacja", "password", "Password should contain at least one lowercase letter");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
-        if (!password.matches(".*[A-Z].*"))
-        {
+        if (!password.matches(".*[A-Z].*")) {
             Error error = new Error("Weryfikacja", "password", "Password should contain at least one uppercase letter");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
-        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"))
-        {
+        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
             Error error = new Error("Weryfikacja", "password", "Password should contain at least one special character");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
-        if (!password.matches(".*\\d.*"))
-        {
+        if (!password.matches(".*\\d.*")) {
             Error error = new Error("Weryfikacja", "password", "Password should contain at least one digit");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
-        if (password.contains(" "))
-        {
+        if (password.contains(" ")) {
             Error error = new Error("Weryfikacja", "password", "Password should not contain spaces");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
-        
+
         return ResponseEntity.ok("password is approved.");
     }
     public User getUserByEmail(String email) {
@@ -77,7 +72,7 @@ public class UserService
                 );
     }
 
-    private ResponseEntity<?> checkFullName(String firstname, String lastname) {
+    private ResponseEntity < ? > checkFullName(String firstname, String lastname) {
         if (firstname.length() > 50) {
             Error error = new Error("Weryfikacja", "firstname", "Invalid firstname");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -88,20 +83,20 @@ public class UserService
         }
         return ResponseEntity.ok("fullname checked.");
     }
-    private ResponseEntity<?> checkEmailExists(String email) {
+    private ResponseEntity < ? > checkEmailExists(String email) {
         if (userDAO.existsUserWithEmail(email)) {
             throw new DuplicateResourceException("Email already taken");
         }
         return null;
     }
 
-    public ResponseEntity<?> addUser(UserRegistrationRequest userRegistrationRequest) {
-        final String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-                + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-        if (userRegistrationRequest.firstname() == null || userRegistrationRequest.firstname() == "" || userRegistrationRequest.lastname() == ""
-                || userRegistrationRequest.lastname() == null || userRegistrationRequest.email() == null || userRegistrationRequest.email() == ""
-                || userRegistrationRequest.password() == null || userRegistrationRequest.password() == ""
-                || userRegistrationRequest.birthDate() == null || userRegistrationRequest.isActive() == null) {
+    public ResponseEntity < ? > addUser(UserRegistrationRequest userRegistrationRequest) {
+        final String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" +
+                "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+        if (userRegistrationRequest.firstname() == null || userRegistrationRequest.firstname() == "" || userRegistrationRequest.lastname() == "" ||
+                userRegistrationRequest.lastname() == null || userRegistrationRequest.email() == null || userRegistrationRequest.email() == "" ||
+                userRegistrationRequest.password() == null || userRegistrationRequest.password() == "" ||
+                userRegistrationRequest.birthDate() == null || userRegistrationRequest.isActive() == null) {
             Error error = new Error("Weryfikacja", null, "Missing data");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
@@ -119,9 +114,9 @@ public class UserService
             Error error = new Error("Weryfikacja", "birthdate", "Date of birth cannot be in the future");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
-        if (currentZonedDateTime.getMonthValue() < birthDateWithZonedDateTime.getMonthValue()
-                || (currentZonedDateTime.getMonthValue() == birthDateWithZonedDateTime.getMonthValue()
-                && currentZonedDateTime.getDayOfMonth() < birthDateWithZonedDateTime.getDayOfMonth())) {
+        if (currentZonedDateTime.getMonthValue() < birthDateWithZonedDateTime.getMonthValue() ||
+                (currentZonedDateTime.getMonthValue() == birthDateWithZonedDateTime.getMonthValue() &&
+                        currentZonedDateTime.getDayOfMonth() < birthDateWithZonedDateTime.getDayOfMonth())) {
             age--;
         }
         //Confirmation that he is at least 13 years old in that day
@@ -134,15 +129,15 @@ public class UserService
             Error error = new Error("Weryfikacja", "email", "Invalid email");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
-        ResponseEntity<?> checkFullNameResult = checkFullName(firstname, lastname);
+        ResponseEntity < ? > checkFullNameResult = checkFullName(firstname, lastname);
         if (checkFullNameResult.getStatusCode() != HttpStatus.OK) {
             return checkFullNameResult;
         }
-        ResponseEntity<?> passwordValidationResult = passwordValidator(password);
+        ResponseEntity < ? > passwordValidationResult = passwordValidator(password);
         if (passwordValidationResult.getStatusCode() != HttpStatus.OK) {
             return passwordValidationResult;
         }
-        ResponseEntity<?> checkEmailExistsResult = checkEmailExists(email);
+        ResponseEntity < ? > checkEmailExistsResult = checkEmailExists(email);
         if (checkEmailExistsResult.getStatusCode() != HttpStatus.OK) {
             return checkEmailExistsResult;
         }

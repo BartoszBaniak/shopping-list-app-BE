@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class UserJPADataAccessService implements UserDAO
-{
+public class UserJPADataAccessService implements UserDAO {
     private final UserRepository userRepository;
 
     public UserJPADataAccessService(UserRepository userRepository) {
@@ -15,7 +14,7 @@ public class UserJPADataAccessService implements UserDAO
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List < User > getAllUsers() {
         return userRepository.findAll();
     }
 
@@ -25,12 +24,12 @@ public class UserJPADataAccessService implements UserDAO
     }
 
     @Override
-    public Optional<User> getUserById(Integer id) {
+    public Optional < User > getUserById(Integer id) {
         return userRepository.findById(id);
     }
 
     @Override
-    public Optional<User> getUserByEmail(String email) {
+    public Optional < User > getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
@@ -50,7 +49,7 @@ public class UserJPADataAccessService implements UserDAO
     }
 
     @Override
-    public Optional<User> getById(Integer userId) {
+    public Optional < User > getById(Integer userId) {
         return userRepository.findById(userId);
     }
 

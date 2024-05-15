@@ -1,11 +1,12 @@
 package com.shoppinglist.springboot.user;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 public class UserController {
     @RestController
-    @RequestMapping("api/v1/users")
+    @RequestMapping("api/users")
     public class CustomerController {
         private final UserService userService;
 
@@ -14,7 +15,7 @@ public class UserController {
         }
 
         @GetMapping
-        public List<User> getCustomers() {
+        public List < User > getCustomers() {
             return userService.getAllUsers();
         }
 
@@ -29,9 +30,9 @@ public class UserController {
         }
 
         @PostMapping
-        @ResponseStatus(HttpStatus.CREATED)
-        public void addUser(@RequestBody UserRegistrationRequest request) {
-            userService.addUser(request);
+        public ResponseEntity < ? > addUser(@RequestBody UserRegistrationRequest request) {
+            ResponseEntity < ? > response = userService.addUser(request);
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         }
 
         @DeleteMapping("{id}")
