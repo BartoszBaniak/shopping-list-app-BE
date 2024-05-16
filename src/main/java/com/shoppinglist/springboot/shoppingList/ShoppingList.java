@@ -19,8 +19,8 @@ public class ShoppingList {
     @ManyToOne
     private User user;
 
-    @OneToMany(mappedBy = "shoppingList")
-    private List < ShoppingListItem > items;
+    @OneToMany(mappedBy = "shoppingList", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ShoppingListItem> items;
 
     public Long getId() {
         return id;

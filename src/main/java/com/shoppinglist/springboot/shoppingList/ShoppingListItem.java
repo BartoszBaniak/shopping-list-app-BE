@@ -11,11 +11,13 @@ public class ShoppingListItem {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "product_id")
     private Product product;
     private int quantity;
     private boolean purchased;
 
     @ManyToOne
+    @JoinColumn(name = "shopping_list_id")
     private ShoppingList shoppingList;
 
     // Getters and setters
