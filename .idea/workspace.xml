@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9512f896-7ab6-48b2-a66e-2c0a638d9413" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/keywordMapping/KeywordCategoryMappingRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/keywordMapping/KeywordCategoryMappingRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/keywords.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/keywords.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
