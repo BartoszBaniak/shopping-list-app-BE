@@ -1,5 +1,7 @@
 package com.shoppinglist.springboot.shoppingList;
 
+import com.shoppinglist.springboot.keywordMapping.KeywordCategoryMapping;
+import com.shoppinglist.springboot.keywordMapping.KeywordCategoryMappingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,13 @@ public class ShoppingListService {
 
     @Autowired
     private ShoppingListItemDAO shoppingListItemDAO;
+    private final KeywordCategoryMappingRepository keywordCategoryMappingRepository;
+
+    public ShoppingListService(ShoppingListDAO shoppingListDAO, ShoppingListItemDAO shoppingListItemDAO, KeywordCategoryMappingRepository keywordCategoryMappingRepository) {
+        this.shoppingListDAO = shoppingListDAO;
+        this.shoppingListItemDAO = shoppingListItemDAO;
+        this.keywordCategoryMappingRepository = keywordCategoryMappingRepository;
+    }
 
     public List<ShoppingList> getAllShoppingLists() {
         return shoppingListDAO.getAllShoppingLists();
@@ -47,6 +56,16 @@ public class ShoppingListService {
     }
 
     public Optional<ShoppingList> addProductToShoppingList(Long id, ShoppingListItem item) {
+        String productName = item.getProduct().getName();
+
+        // Znajdź kategorię na podstawie nazwy produktu w bazie danych
+        Optional<KeywordCategoryMapping> mappingOptional = keywordCategoryMappingRepository.findByKeyword(productName.toLowerCase());
+        String categoryName = mappingOptional.map(KeywordCategoryMapping::getCategory).orElse("Inne");
+
+        Category category = new Category();
+        category.setName(categoryName);
+        item.getProduct().setCategory(category);
+
         return shoppingListDAO.getShoppingListById(id).map(existingShoppingList -> {
             item.setShoppingList(existingShoppingList);
             shoppingListItemDAO.addShoppingListItem(item);
@@ -55,4 +74,5 @@ public class ShoppingListService {
             return existingShoppingList;
         });
     }
+
 }
