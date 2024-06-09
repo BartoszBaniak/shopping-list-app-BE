@@ -1,10 +1,10 @@
 package com.shoppinglist.springboot.shoppingList;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +32,7 @@ public class ShoppingListController {
 
     @PostMapping
     public ShoppingList createShoppingList(@RequestBody ShoppingList shoppingList) {
+        shoppingList.setItems(new ArrayList<>());
         return shoppingListService.saveShoppingList(shoppingList);
     }
 
@@ -55,8 +56,8 @@ public class ShoppingListController {
     }
 
     @PostMapping("/{id}/items")
-    public ResponseEntity<ShoppingList> addProductToShoppingList(@PathVariable Long id, @RequestBody ShoppingListItem item) {
-        Optional<ShoppingList> shoppingList = shoppingListService.addProductToShoppingList(id, item);
+    public ResponseEntity<ShoppingList> addProductToShoppingList(@PathVariable Long id, @RequestBody ShoppingListItemRequest itemRequest) {
+        Optional<ShoppingList> shoppingList = shoppingListService.addProductToShoppingList(id, itemRequest);
         if (shoppingList.isPresent()) {
             return ResponseEntity.ok(shoppingList.get());
         } else {

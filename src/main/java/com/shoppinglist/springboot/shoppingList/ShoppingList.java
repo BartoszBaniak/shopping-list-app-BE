@@ -46,11 +46,11 @@ public class ShoppingList {
         this.user = user;
     }
 
-    public List < ShoppingListItem > getItems() {
+    public List<ShoppingListItem> getItems() {
         return items;
     }
 
-    public void setItems(List < ShoppingListItem > items) {
+    public void setItems(List<ShoppingListItem> items) {
         this.items = items;
     }
 

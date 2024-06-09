@@ -24,7 +24,7 @@ public class UserJPADataAccessService implements UserDAO {
     }
 
     @Override
-    public Optional < User > getUserById(Integer id) {
+    public Optional < User > getUserById(String id) {
         return userRepository.findById(id);
     }
 
@@ -49,12 +49,12 @@ public class UserJPADataAccessService implements UserDAO {
     }
 
     @Override
-    public Optional < User > getById(Integer userId) {
+    public Optional < User > getById(String userId) {
         return userRepository.findById(userId);
     }
 
     @Override
-    public boolean existsById(Integer userId) {
+    public boolean existsById(String userId) {
         return userRepository.existsById(userId);
     }
 }

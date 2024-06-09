@@ -1,6 +1,10 @@
 package com.shoppinglist.springboot.user;
 
-public record UserUpdateRequest
-        (
-                String firstname, String lastname, String email, String address, String phoneNumber
-        ) {}
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
+public record UserUpdateRequest(
+        String firstname, String lastname, LocalDate birthDate
+) {
+}

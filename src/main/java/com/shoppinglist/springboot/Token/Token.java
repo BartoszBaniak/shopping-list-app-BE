@@ -8,34 +8,35 @@ import java.util.Objects;
 
 public class Token {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false)
-    private Integer id;
+    private String id;
     @Column(name = "user_id", updatable = false)
-    private Integer userID;
+    private String userID;
     @Column(name = "content", nullable = false)
     private String content;
 
-    public Token() {}
+    public Token() {
+    }
 
-    public Token(Integer userID, String content) {
+    public Token(String userID, String content) {
         this.userID = userID;
         this.content = content;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public Integer getUserID() {
+    public String getUserID() {
         return userID;
     }
 
-    public void setUserID(Integer id) {
+    public void setUserID(String id) {
         this.userID = id;
     }
 

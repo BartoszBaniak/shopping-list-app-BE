@@ -6,8 +6,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.Objects;
 
+
 @Entity
-@Table(name = "app_user", uniqueConstraints = {
+@Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(
                 name = "user_email_unique",
                 columnNames = "email"
@@ -15,9 +16,9 @@ import java.util.Objects;
 })
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false)
-    private Integer id;
+    private String id;
 
     @Column(name = "firstName", nullable = false)
     private String firstname;
@@ -30,6 +31,7 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;
+
     @Column(name = "birthDate", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
@@ -48,11 +50,11 @@ public class User {
         this.isActive = isActive;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int i) {
+    public void setId(String i) {
         this.id = i;
     }
 
