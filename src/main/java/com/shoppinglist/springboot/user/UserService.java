@@ -1,10 +1,9 @@
 package com.shoppinglist.springboot.user;
 
+import com.shoppinglist.springboot.MailService.MailService;
 import com.shoppinglist.springboot.Token.TokenRepository;
 import com.shoppinglist.springboot.Token.TokenResetRepository;
 import com.shoppinglist.springboot.Token.TokenService;
-import com.shoppinglist.springboot.exceptions.DuplicateResourceException;
-import com.shoppinglist.springboot.exceptions.NotValidResourceException;
 import com.shoppinglist.springboot.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,19 +12,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
-import java.util.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+
+import org.springframework.mail.javamail.JavaMailSender;
 
 
 
@@ -33,14 +29,19 @@ import java.util.*;
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserDAO userDAO;
+
+
     @Autowired
     TokenResetRepository tokenResetRepository;
     private static final long EXPIRATION_TIME_REFRESH = 3600000 * 24;
 
     @Autowired
+    MailService mailService;
+    @Autowired
     TokenService tokenService;
     @Autowired
     private TokenRepository tokenRepository;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -71,35 +72,39 @@ public class UserService {
     private ResponseEntity < ? > checkEmailExists(String email) {
         if (userDAO.existsUserWithEmail(email)) {
             logger.warn("Email already exists");
-            Error error = new Error("Validation", "email", "Email already exists");
+            ApiError error = new ApiError("Validation", "email", "Email already exists");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         return ResponseEntity.ok("Email checked.");
     }
 
-    public ResponseEntity < ? > passwordValidator(String password) {
+    public ResponseEntity < ? > passwordValidator(String password, String retPassword) {
         if (password.length() < 8 || password.length() > 32) {
-            Error error = new Error("Validation", "password", "Password length should be between 8 and 32 characters");
+            ApiError error = new ApiError("Validation", "password", "Password length should be between 8 and 32 characters");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         if (!password.matches(".*[a-z].*")) {
-            Error error = new Error("Validation", "password", "Password should contain at least one lowercase letter");
+            ApiError error = new ApiError("Validation", "password", "Password should contain at least one lowercase letter");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         if (!password.matches(".*[A-Z].*")) {
-            Error error = new Error("Validation", "password", "Password should contain at least one uppercase letter");
+            ApiError error = new ApiError("Validation", "password", "Password should contain at least one uppercase letter");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
-            Error error = new Error("Validation", "password", "Password should contain at least one special character");
+            ApiError error = new ApiError("Validation", "password", "Password should contain at least one special character");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         if (!password.matches(".*\\d.*")) {
-            Error error = new Error("Validation", "password", "Password should contain at least one digit");
+            ApiError error = new ApiError("Validation", "password", "Password should contain at least one digit");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         if (password.contains(" ")) {
-            Error error = new Error("Validation", "password", "Password should not contain spaces");
+            ApiError error = new ApiError("Validation", "password", "Password should not contain spaces");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+        if (!password.equals(retPassword)) {
+            ApiError error = new ApiError("Validation", "retPassword", "Invalid retPassword");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         return ResponseEntity.ok("password is approved.");
@@ -108,12 +113,12 @@ public class UserService {
     private ResponseEntity < ? > checkFullName(String firstname, String lastname) {
         if (firstname.length() > 50) {
             logger.warn("Invalid firstname");
-            Error error = new Error("Validation", "firstname", "Invalid firstname");
+            ApiError error = new ApiError("Validation", "firstname", "Invalid firstname");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         if (lastname.length() > 50) {
             logger.warn("Invalid lastname");
-            Error error = new Error("Validation", "lastname", "Invalid lastname");
+            ApiError error = new ApiError("Validation", "lastname", "Invalid lastname");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         return ResponseEntity.ok("fullname checked.");
@@ -123,50 +128,32 @@ public class UserService {
     public ResponseEntity < ? > addUser(UserRegistrationRequest userRegistrationRequest) {
         final String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" +
                 "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-        if (userRegistrationRequest.firstname() == null || userRegistrationRequest.firstname() == "" || userRegistrationRequest.lastname() == ""
-                || userRegistrationRequest.lastname() == null || userRegistrationRequest.email() == null || userRegistrationRequest.email() == ""
+        if (userRegistrationRequest.firstName() == null || userRegistrationRequest.firstName() == "" || userRegistrationRequest.lastName() == ""
+                || userRegistrationRequest.lastName() == null || userRegistrationRequest.email() == null || userRegistrationRequest.email() == ""
                 || userRegistrationRequest.password() == null || userRegistrationRequest.password() == ""
-                || userRegistrationRequest.birthDate() == null) {
+                || userRegistrationRequest.retPassword() == null || userRegistrationRequest.retPassword() == "") {
             logger.warn("Missing data");
-            Error error = new Error("Validation", null, "Missing data");
+            ApiError error = new ApiError("Validation", null, "Missing data");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
-        String firstname = userRegistrationRequest.firstname();
-        String lastname = userRegistrationRequest.lastname();
+        String firstname = userRegistrationRequest.firstName();
+        String lastname = userRegistrationRequest.lastName();
         String email = userRegistrationRequest.email();
         String password = userRegistrationRequest.password();
-        LocalDate birthDate = userRegistrationRequest.birthDate();
+        String retPassword = userRegistrationRequest.retPassword();
         ZonedDateTime currentZonedDateTime = ZonedDateTime.now();
-        ZonedDateTime birthDateWithZonedDateTime = birthDate.atStartOfDay(currentZonedDateTime.getZone());
-        int age = currentZonedDateTime.getYear() - birthDateWithZonedDateTime.getYear();
 
-        if (birthDateWithZonedDateTime.isAfter(currentZonedDateTime)) {
-            logger.warn("Date of birth cannot be in the future");
-            Error error = new Error("Validation", "birthdate", "Date of birth cannot be in the future");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-        if (currentZonedDateTime.getMonthValue() < birthDateWithZonedDateTime.getMonthValue() ||
-                (currentZonedDateTime.getMonthValue() == birthDateWithZonedDateTime.getMonthValue() &&
-                        currentZonedDateTime.getDayOfMonth() < birthDateWithZonedDateTime.getDayOfMonth())) {
-            age--;
-        }
-        //Confirmation that he is at least 13 years old in that day
-        if (age < 13) {
-            logger.warn("Too young");
-            Error error = new Error("Validation", "birthdate", "Too young");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
 
         if (!checkEmailValid(email, regexPattern) || email.length() > 255) {
             logger.warn("Invalid email");
-            Error error = new Error("Validation", "email", "Invalid email");
+            ApiError error = new ApiError("Validation", "email", "Invalid email");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
         ResponseEntity < ? > checkFullNameResult = checkFullName(firstname, lastname);
         if (checkFullNameResult.getStatusCode() != HttpStatus.OK) {
             return checkFullNameResult;
         }
-        ResponseEntity < ? > passwordValidationResult = passwordValidator(password);
+        ResponseEntity < ? > passwordValidationResult = passwordValidator(password, retPassword);
         if (passwordValidationResult.getStatusCode() != HttpStatus.OK) {
             logger.warn("Invalid password");
             return passwordValidationResult;
@@ -179,39 +166,15 @@ public class UserService {
 
         //Encrypting password
         String generatedSecuredPasswordHash = BCrypt.hashpw(password, BCrypt.gensalt(12));
-        User user = new User(firstname, lastname, email, generatedSecuredPasswordHash, birthDate, false);
+        User user = new User(firstname, lastname, email, generatedSecuredPasswordHash);
         userDAO.addUser(user);
+
+        String refreshToken = tokenService.generateToken(EXPIRATION_TIME_REFRESH, user.getId());
         logger.info("Account created");
         return ResponseEntity.ok("Account activated successfully.");
     }
 
-    @Transactional
-    public ResponseEntity<?> deleteUser(String id, HttpServletRequest request) {
-        ResponseEntity<?> checkAuthorizationResult = checkAuthorization(request);
-        if (checkAuthorizationResult.getStatusCode() != HttpStatus.OK) {
-            Error error = new Error("General", null, "Missing authorization");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-        }
 
-        String userId = getUserIDFromAccessToken(request);
-
-        // Ensure the logged-in user is deleting their own account
-        if (!id.equals(userId)) {
-            Error error = new Error("Forbidden", null, "Access denied");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-        }
-
-        Optional<User> optionalUser = userDAO.getUserById(id);
-        if (!optionalUser.isPresent()) {
-            Error error = new Error("Not Found", null, "User not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        }
-        User user = optionalUser.get();
-        userDAO.deleteUser(user);
-        HttpHeaders headers = new HttpHeaders();
-        tokenService.logoutAllSessions(id, headers);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
 
 
     private boolean checkEmailValid(String email, String emailRegex) {
@@ -223,7 +186,7 @@ public class UserService {
     public ResponseEntity < ? > updateUser(String uuid, UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
         ResponseEntity < ? > checkAuthorizationResult = checkAuthorization(request);
         if (checkAuthorizationResult.getStatusCode() != HttpStatus.OK) {
-            Error error = new Error("General", null, "Missing authorization");
+            ApiError error = new ApiError("General", null, "Missing authorization");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
         User user = userDAO.getUserById(uuid)
@@ -233,7 +196,7 @@ public class UserService {
         var userId = getUserIDFromAccessToken(request);
         //uuid - id of requested user, userId - id of user logged in
         if (!uuid.equals(userId)) {
-            Error error = new Error("Access", null, "Access denied");
+            ApiError error = new ApiError("Access", null, "Access denied");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         }
         if (userUpdateRequest.firstname() != null) {
@@ -246,11 +209,6 @@ public class UserService {
             user.setLastname(lastname);
         }
 
-        if (userUpdateRequest.birthDate() != null) {
-            LocalDate birthDate = userUpdateRequest.birthDate();
-            user.setBirthDate(birthDate);
-        }
-
         userDAO.updateUser(user);
         return ResponseEntity.ok("User updated successfully");
     }
@@ -259,6 +217,7 @@ public class UserService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         return expiryDateTime.isAfter(currentDateTime);
     }
+
 
     private String getFileExtension(String filename) {
         int lastDotIndex = filename.lastIndexOf('.');
@@ -269,40 +228,21 @@ public class UserService {
     }
 
 
-    public ResponseEntity < ? > changePassword(String userId, ChangePasswordRequest changePasswordRequest) {
-        User user = getUserById(userId);
-        String currentPassword = changePasswordRequest.currentPassword();
-        String newPassword = changePasswordRequest.newPassword();
-        if (!BCrypt.checkpw(currentPassword, user.getPassword())) {
-            Error error = new Error("Validation", "Password", "Invalid password");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-        ResponseEntity < ? > passwordValidationResult = passwordValidator(newPassword);
-        if (passwordValidationResult.getStatusCode() != HttpStatus.OK) {
-            return passwordValidationResult;
-        }
-        String hashedNewPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
-        user.setPassword(hashedNewPassword);
-        userDAO.updateUser(user);
-        tokenService.deleteAllTokens(userId);
-        return ResponseEntity.ok().build();
-    }
-
     public ResponseEntity < ? > checkAuthorization(HttpServletRequest request) {
         if (checkAuthorizationHeader(request)) {
             try {
                 if (checkLoggedUser(request)) {
                     return ResponseEntity.ok("Account logged in successfully.");
                 } else {
-                    Error error = new Error("Refresh", null, "Access token expired");
+                    ApiError error = new ApiError("Refresh", null, "Access token expired");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
                 }
             } catch (Exception e) {
-                Error error = new Error("Access", null, "Invalid token");
+                ApiError error = new ApiError("Access", null, "Invalid token");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
             }
         } else {
-            Error error = new Error("Access", null, "Not logged in");
+            ApiError error = new ApiError("Access", null, "Not logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
@@ -341,15 +281,14 @@ public class UserService {
         //Check if user is logged in
         ResponseEntity < ? > checkAuthorizationResult = checkAuthorization(request);
         if (checkAuthorizationResult.getStatusCode() != HttpStatus.OK) {
-            Error error = new Error("General", null, "Missing authorization");
+            ApiError error = new ApiError("General", null, "Missing authorization");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
         var user = userService.getUserById(uuid);
         var userId = userService.getUserIDFromAccessToken(request);
-        var userDTO = new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail(), user.getBirthDate());
+        var userDTO = new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail());
         //uuid - id of requested user, userId - id of user logged in
         if (!uuid.equals(userId)) {
-            userDTO.setBirthDate(null);
             userDTO.setEmail(null);
         }
         return ResponseEntity.ok()
@@ -357,4 +296,12 @@ public class UserService {
                 .body(userDTO);
     }
 
+    public void deleteUser1(String id) {
+        User user = userDAO.getUserById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Customer with id [%s] not found".formatted(id))
+                );
+
+        userDAO.deleteUser(user);
+    }
 }

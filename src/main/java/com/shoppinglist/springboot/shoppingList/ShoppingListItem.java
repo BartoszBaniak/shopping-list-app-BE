@@ -1,10 +1,9 @@
 package com.shoppinglist.springboot.shoppingList;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-import java.util.Objects;
 
 @Entity
-@Table(name = "ShoppingListItem")
 public class ShoppingListItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,73 +12,54 @@ public class ShoppingListItem {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-    private int quantity;
-    private boolean purchased;
 
     @ManyToOne
-    @JoinColumn(name = "shopping_list_id")
+    @JoinColumn(name = "shopping_list_id", nullable = false)
     private ShoppingList shoppingList;
 
-    // Getters and setters
+    private boolean purchased;
+
+    private int quantity; // Dodane pole quantity
+
+    // Gettery
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Product getProduct() {
         return product;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public ShoppingList getShoppingList() {
+        return shoppingList;
     }
 
     public boolean isPurchased() {
         return purchased;
     }
 
-    public void setPurchased(boolean purchased) {
-        this.purchased = purchased;
+    public int getQuantity() { // Getter dla quantity
+        return quantity;
     }
 
-    public ShoppingList getShoppingList() {
-        return shoppingList;
+    // Settery
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public void setShoppingList(ShoppingList shoppingList) {
         this.shoppingList = shoppingList;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ShoppingListItem that = (ShoppingListItem) o;
-        return id.equals(that.id) &&
-                Objects.equals(product, that.product);
+    public void setPurchased(boolean purchased) {
+        this.purchased = purchased;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, product);
-    }
-
-    @Override
-    public String toString() {
-        return "ShoppingListItem{" +
-                "id=" + id +
-                ", produkt='" + product + '\'' +
-                '}';
+    public void setQuantity(int quantity) { // Setter dla quantity
+        this.quantity = quantity;
     }
 }

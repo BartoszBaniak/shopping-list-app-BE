@@ -10,14 +10,13 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private LocalDate birthDate;
 
-    public UserDTO(String id, String firstname, String lastname, String email, @Nullable LocalDate birthDate) {
+
+    public UserDTO(String id, String firstname, String lastname, String email) {
         this.id = id;
         this.firstName = firstname;
         this.lastName = lastname;
         this.email = email;
-        this.birthDate = birthDate;
     }
 
     public String getId() {
@@ -34,14 +33,6 @@ public class UserDTO {
 
     public String getEmail() {
         return email;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
     }
 
     public void setEmail(String email) {

@@ -5,6 +5,6 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 public record UserUpdateRequest(
-        String firstname, String lastname, LocalDate birthDate
+        String firstname, String lastname
 ) {
 }

@@ -3,7 +3,7 @@ package com.shoppinglist.springboot.Token;
 import com.shoppinglist.springboot.user.User;
 import com.shoppinglist.springboot.exceptions.ResourceNotFoundException;
 import com.shoppinglist.springboot.exceptions.NotValidResourceException;
-import com.shoppinglist.springboot.user.Error;
+import com.shoppinglist.springboot.user.ApiError;
 import com.shoppinglist.springboot.user.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -86,12 +86,12 @@ public class TokenService {
                         .body(accessToken);
             } else {
                 logger.warn("Invalid password");
-                Error error = new Error("Validation", "Password", "Invalid password");
+                ApiError error = new ApiError("Validation", "Password", "Invalid password");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             }
         } catch (ResourceNotFoundException ex) {
             logger.warn("Invalid e-mail");
-            Error error = new Error("Validation", "E-mail", "Invalid e-mail");
+            ApiError error = new ApiError("Validation", "E-mail", "Invalid e-mail");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
@@ -110,21 +110,21 @@ public class TokenService {
                     String accessToken = generateToken(EXPIRATION_TIME_ACCESS, userID);
                     return ResponseEntity.ok().body(accessToken);
                 } else {
-                    Error error = new Error("Refresh", null, "Invalid token");
+                    ApiError error = new ApiError("Refresh", null, "Invalid token");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
                 }
             } catch (ExpiredJwtException e) {
                 // token unnactive
-                Error error = new Error("Refresh", null, "Expired token");
+                ApiError error = new ApiError("Refresh", null, "Expired token");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
             } catch (ResourceNotFoundException e) {
                 // token not in database
-                Error error = new Error("Refresh", null, "token not in database");
+                ApiError error = new ApiError("Refresh", null, "token not in database");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
             }
         } else {
             // Cookie refreshToken not found
-            Error error = new Error("Refresh", null, "Empty cookie");
+            ApiError error = new ApiError("Refresh", null, "Empty cookie");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
