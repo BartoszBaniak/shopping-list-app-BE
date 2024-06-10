@@ -5,49 +5,49 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9512f896-7ab6-48b2-a66e-2c0a638d9413" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/PasswordResetToken.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenResetRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListItemRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/productRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/ChangePasswordRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/MailService/MailService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/config/MailConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ProductService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/Token.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/Token.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenJPADataAccessService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenJPADataAccessService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/Token/TokenService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/config/WebConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/Category.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/Product.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingList.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingList.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListItemDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListItemJPADataAccessService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListItemRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListItemRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListItemRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ShoppingListService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/productRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ProductRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/Error.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/ApiError.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserJPADataAccessService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserJPADataAccessService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserRegistrationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserRegistrationRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/user/UserUpdateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/Token.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/Token.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenJPADataAccessService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenJPADataAccessService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/Token/TokenService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/Category.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/Product.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/Product.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingList.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingList.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListItem.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListItemDAO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListItemJPADataAccessService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListItemRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListJPADataAccessService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListJPADataAccessService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/Error.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserController$CustomerController.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserJPADataAccessService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserJPADataAccessService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserRegistrationRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserRegistrationRequest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserUpdateRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/user/UserUpdateRequest.class" afterDir="false" />
     </list>

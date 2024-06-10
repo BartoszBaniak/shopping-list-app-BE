@@ -6,7 +6,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.Objects;
 
-
 @Entity
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(
@@ -32,22 +31,13 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "birthDate", nullable = false)
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate birthDate;
-
-    @Column(name = "isActive", nullable = false, columnDefinition = "boolean default false")
-    private boolean isActive;
-
     public User() {}
 
-    public User(String firstname, String lastname, String email, String password, LocalDate birthDate, boolean isActive) {
+    public User(String firstname, String lastname, String email, String password) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
-        this.birthDate = birthDate;
-        this.isActive = isActive;
     }
 
     public String getId() {
@@ -90,21 +80,7 @@ public class User {
         this.password = password;
     }
 
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
 
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -115,14 +91,12 @@ public class User {
                 Objects.equals(firstname, user.firstname) &&
                 Objects.equals(lastname, user.lastname) &&
                 Objects.equals(email, user.email) &&
-                Objects.equals(password, user.password) &&
-                Objects.equals(birthDate, user.birthDate) &&
-                Objects.equals(isActive, user.isActive);
+                Objects.equals(password, user.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstname, lastname, email, password, birthDate, isActive);
+        return Objects.hash(id, firstname, lastname, email, password);
     }
 
     @Override
@@ -133,8 +107,6 @@ public class User {
                 ", lastname='" + lastname + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", birthDate='" + birthDate + '\'' +
-                ", isActive=" + isActive +
                 '}';
     }
 }

@@ -1,7 +1,7 @@
 package com.shoppinglist.springboot.user;
 
-import java.time.LocalDate;
-public record UserRegistrationRequest
-        (
-                String firstname, String lastname, String email, String password, LocalDate birthDate, Boolean isActive
-        ) {}
+
+public record UserRegistrationRequest(
+        String firstName, String lastName, String email, String password, String retPassword
+) {
+}

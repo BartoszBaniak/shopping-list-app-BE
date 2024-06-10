@@ -1,7 +1,7 @@
 package com.shoppinglist.springboot.Token;
 
 import com.shoppinglist.springboot.user.User;
-import com.shoppinglist.springboot.user.Error;
+import com.shoppinglist.springboot.user.ApiError;
 import com.shoppinglist.springboot.user.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,15 +31,15 @@ public class TokenController {
     public ResponseEntity < ? > login(@RequestBody LoginRequest requestBody) {
         if ((requestBody.email() == null && requestBody.password() == null) || (requestBody.email() == "" && requestBody.password() == "")) {
             logger.warn("Missing e-mail and password");
-            Error error = new Error("Validation", "Both", "Missing data");
+            ApiError error = new ApiError("Validation", "Both", "Missing data");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } else if (requestBody.email() == null || requestBody.email() == "") {
             logger.warn("Missing e-mail");
-            Error error = new Error("Validation", "E-mail", "Missing e-mail");
+            ApiError error = new ApiError("Validation", "E-mail", "Missing e-mail");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } else if (requestBody.password() == null || requestBody.password() == "") {
             logger.warn("Missing password");
-            Error error = new Error("Validation", "Password", "Missing password");
+            ApiError error = new ApiError("Validation", "Password", "Missing password");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } else {
             logger.info("User logged");
@@ -50,7 +50,7 @@ public class TokenController {
     @GetMapping("refresh")
     public ResponseEntity < ? > refresh(@CookieValue(value = "refreshToken", defaultValue = "") String refreshToken) {
         if (refreshToken == null) {
-            Error error = new Error("Refresh", null, "No token");
+            ApiError error = new ApiError("Refresh", null, "No token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         } else {
             return tokenService.refreshToken(refreshToken);
@@ -80,12 +80,12 @@ public class TokenController {
                         .headers(headers)
                         .build();
             } catch (Exception e) {
-                Error error = new Error("logout", "", "error during logout");
+                ApiError error = new ApiError("logout", "", "error during logout");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
             }
         } else {
             // Brak ciasteczka
-            Error error = new Error("logout", "", "missing cookie");
+            ApiError error = new ApiError("logout", "", "missing cookie");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
