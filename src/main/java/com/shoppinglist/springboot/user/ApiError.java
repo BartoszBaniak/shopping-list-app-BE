@@ -1,11 +1,11 @@
 package com.shoppinglist.springboot.user;
 
-public class Error {
+public class ApiError {
     private String type;
     private String field;
     private String message;
 
-    public Error(String type, String field, String message) {
+    public ApiError(String type, String field, String message) {
         this.type = type;
         this.field = field;
         this.message = message;

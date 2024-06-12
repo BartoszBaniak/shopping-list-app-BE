@@ -5,12 +5,12 @@ import java.util.Optional;
 public interface TokenDAO {
     void addToken(Token token);
 
-    Optional < Token > getTokenById(Integer userID);
+    Optional<Token> getTokenById(String userID);
 
-    Optional < Token > getTokenByContent(String token);
+    Optional<Token> getTokenByContent(String token);
 
     void deleteByContent(String tokenContent);
 
-    void deleteAllTokens(Integer userID);
+    void deleteAllTokens(String userID);
 
 }

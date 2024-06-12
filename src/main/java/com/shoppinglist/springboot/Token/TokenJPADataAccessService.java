@@ -1,6 +1,7 @@
 package com.shoppinglist.springboot.Token;
 
 import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
 @Repository
@@ -17,20 +18,21 @@ public class TokenJPADataAccessService implements TokenDAO {
     }
 
     @Override
-    public Optional < Token > getTokenById(Integer userID) {
+    public Optional<Token> getTokenById(String userID) {
         return tokenRepository.findById(userID);
     }
 
     @Override
-    public Optional < Token > getTokenByContent(String token) {
+    public Optional<Token> getTokenByContent(String token) {
         return tokenRepository.findByContent(token);
     }
     public void deleteByContent(String tokenContent) {
         tokenRepository.deleteByContent(tokenContent);
     }
 
-    public void deleteAllTokens(Integer userID) {
+    public void deleteAllTokens(String userID) {
         tokenRepository.deleteAllByUserID(userID);
     }
+
 
 }

@@ -3,7 +3,7 @@ package com.shoppinglist.springboot.Token;
 import com.shoppinglist.springboot.user.User;
 import com.shoppinglist.springboot.exceptions.ResourceNotFoundException;
 import com.shoppinglist.springboot.exceptions.NotValidResourceException;
-import com.shoppinglist.springboot.user.Error;
+import com.shoppinglist.springboot.user.ApiError;
 import com.shoppinglist.springboot.user.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -12,11 +12,15 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import java.security.Key;
@@ -24,6 +28,7 @@ import java.util.Date;
 
 @Service
 public class TokenService {
+    private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
     private static final long EXPIRATION_TIME_ACCESS = 900000;
     private static final long EXPIRATION_TIME_REFRESH = 3600000 * 24;
     private final TokenDAO tokenDAO;
@@ -35,7 +40,7 @@ public class TokenService {
         this.jwtKey = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public void addToken(Integer userId, String tokenString) {
+    public void addToken(String userId, String tokenString) {
         if (tokenString == null) {
             throw new NotValidResourceException("Missing data");
         }
@@ -50,7 +55,7 @@ public class TokenService {
                 );
     }
 
-    public String generateToken(long expirationDate, Integer userID) {
+    public String generateToken(long expirationDate, String userID) {
         long currentTimeMillis = System.currentTimeMillis();
         Date expirationDateToken = new Date(currentTimeMillis + expirationDate);
         String token = Jwts.builder()
@@ -80,11 +85,13 @@ public class TokenService {
                         .header("Set-Cookie", cookieValue)
                         .body(accessToken);
             } else {
-                Error error = new Error("Validation", "Password", "Invalid password");
+                logger.warn("Invalid password");
+                ApiError error = new ApiError("Validation", "Password", "Invalid password");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             }
         } catch (ResourceNotFoundException ex) {
-            Error error = new Error("Validation", "E-mail", "Invalid e-mail");
+            logger.warn("Invalid e-mail");
+            ApiError error = new ApiError("Validation", "E-mail", "Invalid e-mail");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
@@ -94,30 +101,30 @@ public class TokenService {
             try {
                 Claims claims = Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(refreshToken).getBody();
                 // getting userID from refresh token
-                Long userID = Long.parseLong(claims.getSubject());
+                String userID = claims.getSubject();
                 // getting refresh token from database
                 Token dataBaseRefreshToken = getTokenByContent(refreshToken);
                 // checking refresh token
-                if (dataBaseRefreshToken.getContent().equals(refreshToken) && dataBaseRefreshToken.getUserID().equals(userID.intValue())) {
+                if (dataBaseRefreshToken.getContent().equals(refreshToken) && dataBaseRefreshToken.getUserID().equals(userID)) {
                     // Creating new access token
-                    String accessToken = generateToken(EXPIRATION_TIME_ACCESS, userID.intValue());
+                    String accessToken = generateToken(EXPIRATION_TIME_ACCESS, userID);
                     return ResponseEntity.ok().body(accessToken);
                 } else {
-                    Error error = new Error("Refresh", null, "Invalid token");
+                    ApiError error = new ApiError("Refresh", null, "Invalid token");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
                 }
             } catch (ExpiredJwtException e) {
                 // token unnactive
-                Error error = new Error("Refresh", null, "Expired token");
+                ApiError error = new ApiError("Refresh", null, "Expired token");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
             } catch (ResourceNotFoundException e) {
                 // token not in database
-                Error error = new Error("Refresh", null, "token not in database");
+                ApiError error = new ApiError("Refresh", null, "token not in database");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
             }
         } else {
             // Cookie refreshToken not found
-            Error error = new Error("Refresh", null, "Empty cookie");
+            ApiError error = new ApiError("Refresh", null, "Empty cookie");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
@@ -131,19 +138,21 @@ public class TokenService {
         }
     }
 
-    public Integer getUserIdFromToken(String token) {
+    public String getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtKey)
                 .parseClaimsJws(token)
                 .getBody();
-        return Integer.parseInt(claims.getSubject());
+        return claims.getSubject();
     }
+
     @Transactional
     public void deleteToken(String tokenContent) {
         tokenDAO.deleteByContent(tokenContent);
     }
+
     @Transactional
-    public void deleteAllTokens(Integer userID) {
+    public void deleteAllTokens(String userID) {
         tokenDAO.deleteAllTokens(userID);
     }
 
@@ -159,4 +168,17 @@ public class TokenService {
         }
     }
 
+    public void logoutAllSessions(String userId, HttpHeaders headers) {
+        // Usunięcie wszystkich tokenów użytkownika z bazy danych
+        deleteAllTokens(userId);
+
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
 }

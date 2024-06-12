@@ -1,5 +1,6 @@
 package com.shoppinglist.springboot.shoppingList;
 
+import com.shoppinglist.springboot.keywordMapping.KeywordCategoryMapping;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
@@ -11,8 +12,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @ManyToOne
-    private Category category;
+    private String category;
 
     public Long getId() {
         return id;
@@ -30,11 +30,12 @@ public class Product {
         this.name = name;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(String category) {
         this.category = category;
     }
+
 }
