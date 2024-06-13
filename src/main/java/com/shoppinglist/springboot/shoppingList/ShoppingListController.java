@@ -174,7 +174,7 @@ public class ShoppingListController {
     @DeleteMapping("/{shoppingListId}/products/delete")
     public ResponseEntity<?> deleteProductsFromList(
             @PathVariable Long shoppingListId,
-            @RequestBody List<String> productNames,
+            @RequestParam List<String> productNames,
             HttpServletRequest request) {
 
         // Sprawdzenie uwierzytelnienia
