@@ -119,4 +119,8 @@ public class ShoppingListService {
     public List<ShoppingListItem> findAllItemsByShoppingListId(Long shoppingListId) {
         return shoppingListItemRepository.findAllByShoppingListId(shoppingListId);
     }
+    @Transactional
+    public void updateShoppingListName(ShoppingList shoppingList) {
+        shoppingListRepository.save(shoppingList);
+    }
 }

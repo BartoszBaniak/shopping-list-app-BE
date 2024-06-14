@@ -284,4 +284,46 @@ public class ShoppingListController {
             return ResponseEntity.ok(itemsResponse);
         }
     }
+    @PutMapping("/{shoppingListId}/updateName")
+    public ResponseEntity<?> updateShoppingListName(
+            @PathVariable Long shoppingListId,
+            @RequestParam String newName,
+            HttpServletRequest request) {
+
+        // Sprawdzenie uwierzytelnienia
+        ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
+        if (authorizationResult.getStatusCode() != HttpStatus.OK) {
+            return authorizationResult;
+        }
+
+        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
+        String userId = userService.getUserIDFromAccessToken(request);
+        if (userId == null) {
+            ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        // Pobranie listy zakupów
+        Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
+        if (optionalShoppingList.isEmpty()) {
+            ApiError error = new ApiError("Not Found", null, "Shopping list not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
+        ShoppingList shoppingList = optionalShoppingList.get();
+
+        // Sprawdź, czy użytkownik jest właścicielem listy
+        if (!shoppingList.getUser().getId().equals(userId)) {
+            ApiError error = new ApiError("Forbidden", null, "You are not authorized to modify this shopping list");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
+
+        // Aktualizacja nazwy listy
+        shoppingList.setName(newName);
+
+        // Zapisanie zaktualizowanej listy w bazie danych
+        shoppingListService.updateShoppingListName(shoppingList);
+
+        return ResponseEntity.ok().build();
+    }
 }
