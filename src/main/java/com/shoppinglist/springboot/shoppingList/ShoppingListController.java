@@ -89,6 +89,59 @@ public class ShoppingListController {
         return ResponseEntity.ok(savedList);
     }
 
+    @GetMapping("/{shoppingListId}")
+    public ResponseEntity<?> getShoppingList(@PathVariable Long shoppingListId, HttpServletRequest request) {
+        // Sprawdzenie uwierzytelnienia
+        ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
+        if (authorizationResult.getStatusCode() != HttpStatus.OK) {
+            return authorizationResult;
+        }
+
+        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
+        String userId = userService.getUserIDFromAccessToken(request);
+        if (userId == null) {
+            ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        // Pobranie listy zakupów
+        Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
+        if (optionalShoppingList.isEmpty()) {
+            ApiError error = new ApiError("Not Found", null, "Shopping list not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
+        ShoppingList shoppingList = optionalShoppingList.get();
+
+        // Sprawdź, czy użytkownik jest właścicielem listy lub ma do niej dostęp
+        if (!shoppingList.getUser().getId().equals(userId)) {
+            ApiError error = new ApiError("Forbidden", null, "You are not authorized to view this shopping list");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
+
+        // Znajdź elementy listy zakupów
+        List<ShoppingListItem> items = shoppingListService.findAllItemsByShoppingListId(shoppingListId);
+
+        // Przygotuj odpowiedź
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", shoppingList.getId());
+        response.put("name", shoppingList.getName());
+        // Dodaj inne informacje o liście zakupów, jeśli potrzeba
+
+        List<Map<String, Object>> itemsResponse = new ArrayList<>();
+        for (ShoppingListItem item : items) {
+            Map<String, Object> itemInfo = new HashMap<>();
+            itemInfo.put("productName", item.getProduct().getName());
+            itemInfo.put("quantity", item.getQuantity());
+            itemInfo.put("category", item.getProduct().getCategory());
+            itemsResponse.add(itemInfo);
+        }
+        response.put("items", itemsResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+
     @PostMapping("/{shoppingListId}/products/add")
     public ResponseEntity<?> addProductsToList(
             @PathVariable Long shoppingListId,
