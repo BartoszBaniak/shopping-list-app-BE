@@ -81,7 +81,7 @@ public class ShoppingListController {
         ShoppingList newList = new ShoppingList();
         newList.setName(name);
         newList.setUser(user); // Przypisanie użytkownika do listy zakupów
-        newList.setStatus(Status.ACTIVE);
+
         // Zapisanie listy w bazie danych
         ShoppingList savedList = shoppingListService.createShoppingList(newList);
 
@@ -378,20 +378,5 @@ public class ShoppingListController {
         shoppingListService.updateShoppingListName(shoppingList);
 
         return ResponseEntity.ok().build();
-    }
-    @PutMapping("/{shoppingListId}/updateStatus")
-    public ResponseEntity<?> updateShoppingListStatus(
-            @PathVariable Long shoppingListId,
-            @RequestParam Status newStatus,
-            HttpServletRequest request) {
-        // Sprawdzenie uwierzytelnienia i uprawnień użytkownika...
-
-        try {
-            shoppingListService.updateShoppingListStatus(shoppingListId, newStatus);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            ApiError error = new ApiError("Internal Server Error", null, "Failed to update shopping list status: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
     }
 }
