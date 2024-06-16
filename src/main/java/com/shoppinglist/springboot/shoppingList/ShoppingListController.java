@@ -91,28 +91,49 @@ public class ShoppingListController {
 
     @GetMapping("/{shoppingListId}")
     public ResponseEntity<?> getShoppingList(@PathVariable Long shoppingListId, HttpServletRequest request) {
-        // Check authentication and authorization
+        // Sprawdzenie uwierzytelnienia
+        ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
+        if (authorizationResult.getStatusCode() != HttpStatus.OK) {
+            return authorizationResult;
+        }
 
-        // Retrieve ShoppingList
+        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
+        String userId = userService.getUserIDFromAccessToken(request);
+        if (userId == null) {
+            ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        // Pobranie listy zakupów
         Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
         if (optionalShoppingList.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            ApiError error = new ApiError("Not Found", null, "Shopping list not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
         ShoppingList shoppingList = optionalShoppingList.get();
 
-        // Prepare response
+        // Sprawdź, czy użytkownik jest właścicielem listy lub ma do niej dostęp
+        if (!shoppingList.getUser().getId().equals(userId)) {
+            ApiError error = new ApiError("Forbidden", null, "You are not authorized to view this shopping list");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
+
+        // Znajdź elementy listy zakupów
+        List<ShoppingListItem> items = shoppingListService.findAllItemsByShoppingListId(shoppingListId);
+
+        // Przygotuj odpowiedź
         Map<String, Object> response = new HashMap<>();
         response.put("id", shoppingList.getId());
         response.put("name", shoppingList.getName());
-        // Add other shopping list details as needed
+        // Dodaj inne informacje o liście zakupów, jeśli potrzeba
 
         List<Map<String, Object>> itemsResponse = new ArrayList<>();
-        for (ShoppingListItem item : shoppingList.getItems()) {
+        for (ShoppingListItem item : items) {
             Map<String, Object> itemInfo = new HashMap<>();
-            itemInfo.put("productName", item.getProductName()); // Use productName instead of accessing Product object
+            itemInfo.put("productName", item.getProduct().getName());
             itemInfo.put("quantity", item.getQuantity());
-            itemInfo.put("category", item.getProduct().getCategory()); // Example of accessing related data
+            itemInfo.put("category", item.getProduct().getCategory());
             itemsResponse.add(itemInfo);
         }
         response.put("items", itemsResponse);

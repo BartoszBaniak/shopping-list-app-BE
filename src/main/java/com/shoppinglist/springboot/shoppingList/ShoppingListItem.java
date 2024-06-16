@@ -18,12 +18,10 @@ public class ShoppingListItem {
     private ShoppingList shoppingList;
 
     private boolean purchased;
-    private int quantity;
 
-    @Column(name = "product_name")
-    private String productName; // New field for product name
+    private int quantity; // Dodane pole quantity
 
-    // Getters and Setters
+    // Gettery
     public Long getId() {
         return id;
     }
@@ -32,39 +30,36 @@ public class ShoppingListItem {
         return product;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
     public ShoppingList getShoppingList() {
         return shoppingList;
-    }
-
-    public void setShoppingList(ShoppingList shoppingList) {
-        this.shoppingList = shoppingList;
     }
 
     public boolean isPurchased() {
         return purchased;
     }
 
+    public int getQuantity() { // Getter dla quantity
+        return quantity;
+    }
+
+    // Settery
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public void setShoppingList(ShoppingList shoppingList) {
+        this.shoppingList = shoppingList;
+    }
+
     public void setPurchased(boolean purchased) {
         this.purchased = purchased;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
+    public void setQuantity(int quantity) { // Setter dla quantity
         this.quantity = quantity;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
     }
 }
