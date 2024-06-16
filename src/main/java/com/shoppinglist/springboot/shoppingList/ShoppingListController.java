@@ -24,359 +24,155 @@ public class ShoppingListController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserShoppingLists(@PathVariable String userId, HttpServletRequest request) {
-        // Sprawdzenie uwierzytelnienia
         ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
         if (authorizationResult.getStatusCode() != HttpStatus.OK) {
             return authorizationResult;
         }
 
-        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
-        String authenticatedUserId = userService.getUserIDFromAccessToken(request);
-        if (authenticatedUserId == null) {
-            ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-        }
-
-        // Sprawdzenie, czy żądany użytkownik zgadza się z zalogowanym użytkownikiem
-        if (!authenticatedUserId.equals(userId)) {
-            ApiError error = new ApiError("Forbidden", null, "You are not authorized to view shopping lists for this user");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-        }
-
-        // Pobranie list zakupów użytkownika
         List<ShoppingListDTO> userShoppingLists = shoppingListService.findShoppingListsByUserId(userId);
 
         if (userShoppingLists.isEmpty()) {
-            ApiError error = new ApiError("Not Found", null, "No shopping lists found for this user");
+            ApiError error = new ApiError("Not Found", null, "No shopping lists found for the user");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
         return ResponseEntity.ok(userShoppingLists);
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createShoppingList(@RequestParam String name, HttpServletRequest request) {
-        // Sprawdzenie uwierzytelnienia
+    @PostMapping
+    public ResponseEntity<?> createShoppingList(@RequestBody ShoppingList shoppingList, HttpServletRequest request) {
         ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
         if (authorizationResult.getStatusCode() != HttpStatus.OK) {
             return authorizationResult;
         }
 
-        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
-        String userId = userService.getUserIDFromAccessToken(request);
-        if (userId == null) {
-            // Jeśli identyfikator użytkownika nie został znaleziony, zwróć błąd
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User ID not found in access token");
-        }
-
-        // Pobranie użytkownika na podstawie identyfikatora
-        User user = userService.getUserById(userId);
-
-        // Sprawdzenie, czy nazwa listy nie jest pusta
-        if (name == null || name.isEmpty()) {
-            return ResponseEntity.badRequest().body("Name cannot be empty!");
-        }
-
-        // Utworzenie nowej listy zakupów
-        ShoppingList newList = new ShoppingList();
-        newList.setName(name);
-        newList.setUser(user); // Przypisanie użytkownika do listy zakupów
-
-        // Zapisanie listy w bazie danych
-        ShoppingList savedList = shoppingListService.createShoppingList(newList);
-
-        // Zwrócenie odpowiedzi
-        return ResponseEntity.ok(savedList);
-    }
-
-    @GetMapping("/{shoppingListId}")
-    public ResponseEntity<?> getShoppingList(@PathVariable Long shoppingListId, HttpServletRequest request) {
-        // Sprawdzenie uwierzytelnienia
-        ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
-        if (authorizationResult.getStatusCode() != HttpStatus.OK) {
-            return authorizationResult;
-        }
-
-        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
-        String userId = userService.getUserIDFromAccessToken(request);
-        if (userId == null) {
+        String authenticatedUserId = userService.getUserIDFromAccessToken(request);
+        if (authenticatedUserId == null) {
             ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
 
-        // Pobranie listy zakupów
-        Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
-        if (optionalShoppingList.isEmpty()) {
-            ApiError error = new ApiError("Not Found", null, "Shopping list not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        if (shoppingList.getUser() == null || !shoppingList.getUser().getId().equals(authenticatedUserId)) {
+            ApiError error = new ApiError("Bad Request", null, "User ID does not match the authenticated user");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
-        ShoppingList shoppingList = optionalShoppingList.get();
-
-        // Sprawdź, czy użytkownik jest właścicielem listy lub ma do niej dostęp
-        if (!shoppingList.getUser().getId().equals(userId)) {
-            ApiError error = new ApiError("Forbidden", null, "You are not authorized to view this shopping list");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-        }
-
-        // Znajdź elementy listy zakupów
-        List<ShoppingListItem> items = shoppingListService.findAllItemsByShoppingListId(shoppingListId);
-
-        // Przygotuj odpowiedź
-        Map<String, Object> response = new HashMap<>();
-        response.put("id", shoppingList.getId());
-        response.put("name", shoppingList.getName());
-        // Dodaj inne informacje o liście zakupów, jeśli potrzeba
-
-        List<Map<String, Object>> itemsResponse = new ArrayList<>();
-        for (ShoppingListItem item : items) {
-            Map<String, Object> itemInfo = new HashMap<>();
-            itemInfo.put("productName", item.getProduct().getName());
-            itemInfo.put("quantity", item.getQuantity());
-            itemInfo.put("category", item.getProduct().getCategory());
-            itemsResponse.add(itemInfo);
-        }
-        response.put("items", itemsResponse);
-
-        return ResponseEntity.ok(response);
+        ShoppingList createdShoppingList = shoppingListService.createShoppingList(shoppingList);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdShoppingList);
     }
 
-
-    @PostMapping("/{shoppingListId}/products/add")
-    public ResponseEntity<?> addProductsToList(
-            @PathVariable Long shoppingListId,
-            @RequestBody Map<String, Integer> productQuantities,
-            HttpServletRequest request) {
-
-        // Sprawdzenie uwierzytelnienia
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateShoppingList(@PathVariable Long id, @RequestBody ShoppingList shoppingList, HttpServletRequest request) {
         ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
         if (authorizationResult.getStatusCode() != HttpStatus.OK) {
             return authorizationResult;
         }
 
-        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
-        String userId = userService.getUserIDFromAccessToken(request);
-        if (userId == null) {
-            // Jeśli identyfikator użytkownika nie został znaleziony, zwróć błąd
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User ID not found in access token");
-        }
-
-        // Pobierz listę zakupów
-        Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
-        if (optionalShoppingList.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Shopping list not found");
-        }
-
-        ShoppingList shoppingList = optionalShoppingList.get();
-
-        // Sprawdź, czy użytkownik jest właścicielem listy
-        if (!shoppingList.getUser().getId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to modify this shopping list");
-        }
-
-        // Zapisz listę zakupów z nowymi produktami
-        shoppingListService.saveShoppingList(shoppingList, productQuantities);
-
-        return ResponseEntity.ok().build();
-    }
-    @PutMapping("/{shoppingListId}/products/update")
-    public ResponseEntity<?> updateProductQuantities(
-            @PathVariable Long shoppingListId,
-            @RequestBody Map<String, Integer> productQuantities,
-            HttpServletRequest request) {
-
-        // Sprawdzenie uwierzytelnienia
-        ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
-        if (authorizationResult.getStatusCode() != HttpStatus.OK) {
-            return authorizationResult;
-        }
-
-        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
-        String userId = userService.getUserIDFromAccessToken(request);
-        if (userId == null) {
-            // Jeśli identyfikator użytkownika nie został znaleziony, zwróć błąd
+        String authenticatedUserId = userService.getUserIDFromAccessToken(request);
+        if (authenticatedUserId == null) {
             ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
 
-        // Pobierz listę zakupów
-        Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
-        if (optionalShoppingList.isEmpty()) {
+        Optional<ShoppingList> existingShoppingList = shoppingListService.findShoppingListById(id);
+        if (existingShoppingList.isEmpty()) {
             ApiError error = new ApiError("Not Found", null, "Shopping list not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
-        ShoppingList shoppingList = optionalShoppingList.get();
+        ShoppingList updatedShoppingList = existingShoppingList.get();
 
-        // Sprawdź, czy użytkownik jest właścicielem listy
-        if (!shoppingList.getUser().getId().equals(userId)) {
-            ApiError error = new ApiError("Forbidden", null, "You are not authorized to modify this shopping list");
+        if (!updatedShoppingList.getUser().getId().equals(authenticatedUserId)) {
+            ApiError error = new ApiError("Forbidden", null, "You are not authorized to update this shopping list");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         }
 
-        // Zaktualizuj ilości produktów na liście zakupów
+        if (shoppingList.getName() != null) {
+            updatedShoppingList.setName(shoppingList.getName());
+        }
+
+        if (shoppingList.getStatus() != null) { // Obsługa pola status
+            updatedShoppingList.setStatus(shoppingList.getStatus());
+        }
+
+        shoppingListService.updateShoppingListName(updatedShoppingList);
+
+        return ResponseEntity.ok(updatedShoppingList);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateShoppingListStatus(@PathVariable Long id, @RequestBody Map<String, String> updateRequest, HttpServletRequest request) {
+        ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
+        if (authorizationResult.getStatusCode() != HttpStatus.OK) {
+            return authorizationResult;
+        }
+
+        String authenticatedUserId = userService.getUserIDFromAccessToken(request);
+        if (authenticatedUserId == null) {
+            ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        Optional<ShoppingList> existingShoppingList = shoppingListService.findShoppingListById(id);
+        if (existingShoppingList.isEmpty()) {
+            ApiError error = new ApiError("Not Found", null, "Shopping list not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
+        ShoppingList shoppingList = existingShoppingList.get();
+
+        if (!shoppingList.getUser().getId().equals(authenticatedUserId)) {
+            ApiError error = new ApiError("Forbidden", null, "You are not authorized to update the status of this shopping list");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
+
+        String newStatus = updateRequest.get("status");
+        if (newStatus == null) {
+            ApiError error = new ApiError("Bad Request", null, "Status is required");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
         try {
-            shoppingListService.updateProductQuantities(shoppingList, productQuantities);
-            return ResponseEntity.ok().build();
+            Status status = Status.valueOf(newStatus); // Konwersja String na Status
+            shoppingListService.updateShoppingListStatus(id, status);
+            return ResponseEntity.ok("Status updated successfully");
+        } catch (IllegalArgumentException e) {
+            ApiError error = new ApiError("Bad Request", null, "Invalid status value");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } catch (Exception e) {
-            ApiError error = new ApiError("Internal Server Error", null, "Failed to update product quantities: " + e.getMessage());
+            ApiError error = new ApiError("Error", null, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
-    @DeleteMapping("/{shoppingListId}/products/delete")
-    public ResponseEntity<?> deleteProductsFromList(
-            @PathVariable Long shoppingListId,
-            @RequestParam List<String> productNames,
-            HttpServletRequest request) {
-
-        // Sprawdzenie uwierzytelnienia
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteShoppingList(@PathVariable Long id, HttpServletRequest request) {
         ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
         if (authorizationResult.getStatusCode() != HttpStatus.OK) {
             return authorizationResult;
         }
 
-        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
-        String userId = userService.getUserIDFromAccessToken(request);
-        if (userId == null) {
+        String authenticatedUserId = userService.getUserIDFromAccessToken(request);
+        if (authenticatedUserId == null) {
             ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
 
-        // Pobierz listę zakupów
-        Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
-        if (optionalShoppingList.isEmpty()) {
+        Optional<ShoppingList> existingShoppingList = shoppingListService.findShoppingListById(id);
+        if (existingShoppingList.isEmpty()) {
             ApiError error = new ApiError("Not Found", null, "Shopping list not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
-        ShoppingList shoppingList = optionalShoppingList.get();
+        ShoppingList shoppingList = existingShoppingList.get();
 
-        // Sprawdź, czy użytkownik jest właścicielem listy
-        if (!shoppingList.getUser().getId().equals(userId)) {
-            ApiError error = new ApiError("Forbidden", null, "You are not authorized to delete products from this shopping list");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-        }
-
-        // Usuń produkty z listy zakupów
-        try {
-            shoppingListService.deleteProductsFromList(shoppingList, productNames);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            ApiError error = new ApiError("Error", null, e.getMessage()); // Zmieniono typ błędu na ogólny
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error); // Zmieniono status na BAD_REQUEST
-        }
-    }
-    @DeleteMapping("/{shoppingListId}/delete")
-    public ResponseEntity<?> deleteShoppingList(
-            @PathVariable Long shoppingListId,
-            HttpServletRequest request) {
-
-        // Sprawdzenie uwierzytelnienia
-        ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
-        if (authorizationResult.getStatusCode() != HttpStatus.OK) {
-            return authorizationResult;
-        }
-
-        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
-        String userId = userService.getUserIDFromAccessToken(request);
-        if (userId == null) {
-            ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-        }
-
-        // Pobierz listę zakupów
-        Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
-        if (optionalShoppingList.isEmpty()) {
-            ApiError error = new ApiError("Not Found", null, "Shopping list not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        }
-
-        ShoppingList shoppingList = optionalShoppingList.get();
-
-        // Sprawdź, czy użytkownik jest właścicielem listy
-        if (!shoppingList.getUser().getId().equals(userId)) {
+        if (!shoppingList.getUser().getId().equals(authenticatedUserId)) {
             ApiError error = new ApiError("Forbidden", null, "You are not authorized to delete this shopping list");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         }
 
-        // Usuń listę zakupów wraz z jej elementami
-        try {
-            shoppingListService.deleteShoppingList(shoppingList);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            ApiError error = new ApiError("Internal Server Error", null, "Failed to delete shopping list: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-    @GetMapping("/{shoppingListId}/items")
-    public ResponseEntity<?> getShoppingListItems(@PathVariable Long shoppingListId) {
-        // Find the shopping list
-        Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
-        if (optionalShoppingList.isEmpty()) {
-            ApiError error = new ApiError("Not Found", null, "Shopping list not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        }
+        shoppingListService.deleteShoppingList(shoppingList);
 
-        // Retrieve all items for the shopping list
-        List<ShoppingListItem> items = shoppingListService.findAllItemsByShoppingListId(shoppingListId);
-
-        // Prepare the response
-        if (items.isEmpty()) {
-            // If there are no items, return an empty response
-            return ResponseEntity.ok(Collections.emptyList());
-        } else {
-            List<Map<String, Object>> itemsResponse = new ArrayList<>();
-            for (ShoppingListItem item : items) {
-                Map<String, Object> itemInfo = new HashMap<>();
-                itemInfo.put("productName", item.getProduct().getName());
-                itemInfo.put("quantity", item.getQuantity());
-                itemInfo.put("category", item.getProduct().getCategory());
-                itemsResponse.add(itemInfo);
-            }
-            return ResponseEntity.ok(itemsResponse);
-        }
-    }
-    @PutMapping("/{shoppingListId}/updateName")
-    public ResponseEntity<?> updateShoppingListName(
-            @PathVariable Long shoppingListId,
-            @RequestParam String newName,
-            HttpServletRequest request) {
-
-        // Sprawdzenie uwierzytelnienia
-        ResponseEntity<?> authorizationResult = userService.checkAuthorization(request);
-        if (authorizationResult.getStatusCode() != HttpStatus.OK) {
-            return authorizationResult;
-        }
-
-        // Pobranie identyfikatora użytkownika z tokenu uwierzytelniającego
-        String userId = userService.getUserIDFromAccessToken(request);
-        if (userId == null) {
-            ApiError error = new ApiError("Unauthorized", null, "User ID not found in access token");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-        }
-
-        // Pobranie listy zakupów
-        Optional<ShoppingList> optionalShoppingList = shoppingListService.findShoppingListById(shoppingListId);
-        if (optionalShoppingList.isEmpty()) {
-            ApiError error = new ApiError("Not Found", null, "Shopping list not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        }
-
-        ShoppingList shoppingList = optionalShoppingList.get();
-
-        // Sprawdź, czy użytkownik jest właścicielem listy
-        if (!shoppingList.getUser().getId().equals(userId)) {
-            ApiError error = new ApiError("Forbidden", null, "You are not authorized to modify this shopping list");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-        }
-
-        // Aktualizacja nazwy listy
-        shoppingList.setName(newName);
-
-        // Zapisanie zaktualizowanej listy w bazie danych
-        shoppingListService.updateShoppingListName(shoppingList);
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Shopping list deleted successfully");
     }
 }

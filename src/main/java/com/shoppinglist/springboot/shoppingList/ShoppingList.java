@@ -1,9 +1,7 @@
 package com.shoppinglist.springboot.shoppingList;
 
 import jakarta.persistence.*;
-
 import java.util.*;
-
 import com.shoppinglist.springboot.user.User;
 
 @Entity
@@ -22,6 +20,9 @@ public class ShoppingList {
     @OneToMany(mappedBy = "shoppingList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShoppingListItem> items = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     // Gettery
     public Long getId() {
         return id;
@@ -39,6 +40,10 @@ public class ShoppingList {
         return items;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
     // Settery
     public void setId(Long id) {
         this.id = id;
@@ -54,5 +59,9 @@ public class ShoppingList {
 
     public void setItems(List<ShoppingListItem> items) {
         this.items = items;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }
