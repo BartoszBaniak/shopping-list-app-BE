@@ -3,8 +3,6 @@ package com.shoppinglist.springboot.shoppingList;
 public class ShoppingListDTO {
     private Long id;
     private String name;
-    private String status; // Dodaj pole status
-
     public Long getId() {
         return id;
     }
@@ -21,12 +19,5 @@ public class ShoppingListDTO {
         this.name = name;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
     // Dodaj gettery i settery dla innych pól według potrzeb
 }

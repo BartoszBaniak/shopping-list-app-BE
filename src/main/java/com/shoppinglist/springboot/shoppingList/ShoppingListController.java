@@ -51,14 +51,6 @@ public class ShoppingListController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
 
-        // Uzupełnienie statusów list zakupów
-        for (ShoppingListDTO shoppingListDTO : userShoppingLists) {
-            Long shoppingListId = shoppingListDTO.getId(); // Pobranie ID listy zakupów
-            // Tutaj możesz użyć odpowiedniej metody z ShoppingListService, aby pobrać status listy
-            String status = shoppingListService.getShoppingListStatus(shoppingListId);
-            shoppingListDTO.setStatus(status);
-        }
-
         return ResponseEntity.ok(userShoppingLists);
     }
 

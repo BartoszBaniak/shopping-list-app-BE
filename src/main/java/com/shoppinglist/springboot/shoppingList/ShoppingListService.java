@@ -127,15 +127,5 @@ public class ShoppingListService {
     public void updateShoppingListStatus(ShoppingList shoppingList) {
         shoppingListRepository.save(shoppingList);
     }
-    public String getShoppingListStatus(Long shoppingListId) {
-        Optional<ShoppingList> optionalShoppingList = shoppingListRepository.findById(shoppingListId);
-        if (optionalShoppingList.isPresent()) {
-            ShoppingList shoppingList = optionalShoppingList.get();
-            return shoppingList.getStatus();
-        } else {
-            // Możesz rzucić wyjątek lub obsłużyć brak listy zakupów
-            throw new IllegalArgumentException("Shopping list with ID " + shoppingListId + " not found");
-        }
-    }
 
 }
