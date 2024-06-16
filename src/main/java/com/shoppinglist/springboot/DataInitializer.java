@@ -19,6 +19,7 @@ public class DataInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         try {
             keywordCategoryMappingService.saveMappingsFromJsonFile();
+            keywordCategoryMappingService.saveProductFromJsonFile();
         } catch (Exception e) {
             // Obsługa błędów, jeśli wystąpią problemy podczas wczytywania danych z pliku JSON
             e.printStackTrace();
