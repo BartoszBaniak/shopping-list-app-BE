@@ -30,6 +30,7 @@ public class ShoppingListService {
         return shoppingListRepository.save(shoppingList);
     }
 
+    @Transactional
     public void saveShoppingList(ShoppingList shoppingList, Map<String, Integer> productQuantities) {
         for (Map.Entry<String, Integer> entry : productQuantities.entrySet()) {
             String productName = entry.getKey();
@@ -51,7 +52,9 @@ public class ShoppingListService {
             newItem.setProduct(product);
             newItem.setShoppingList(shoppingList);
             newItem.setPurchased(false);
-            newItem.setQuantity(quantity); // Ustawienie ilości produktu
+            newItem.setQuantity(quantity);
+            newItem.setProductName(productName); // Set product name
+
             shoppingList.getItems().add(newItem);
         }
 
@@ -62,22 +65,22 @@ public class ShoppingListService {
         return shoppingListRepository.findById(id);
     }
 
+    @Transactional
     public void updateProductQuantities(ShoppingList shoppingList, Map<String, Integer> productQuantities) throws Exception {
         List<ShoppingListItem> items = shoppingList.getItems();
         for (Map.Entry<String, Integer> entry : productQuantities.entrySet()) {
             String productName = entry.getKey();
             Integer quantity = entry.getValue();
 
-            // Szukamy produktu na liście
-            boolean found = false;
-            for (ShoppingListItem item : items) {
-                if (item.getProduct().getName().equals(productName)) {
-                    item.setQuantity(quantity);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
+            // Find the corresponding ShoppingListItem by productName
+            Optional<ShoppingListItem> optionalItem = items.stream()
+                    .filter(item -> item.getProductName().equals(productName))
+                    .findFirst();
+
+            if (optionalItem.isPresent()) {
+                ShoppingListItem item = optionalItem.get();
+                item.setQuantity(quantity);
+            } else {
                 throw new Exception("Product '" + productName + "' not found in shopping list");
             }
         }
@@ -117,7 +120,12 @@ public class ShoppingListService {
         return shoppingListDTOs;
     }
     public List<ShoppingListItem> findAllItemsByShoppingListId(Long shoppingListId) {
-        return shoppingListItemRepository.findAllByShoppingListId(shoppingListId);
+        List<ShoppingListItem> items = shoppingListItemRepository.findAllByShoppingListId(shoppingListId);
+        for (ShoppingListItem item : items) {
+            Product product = item.getProduct();
+            item.setProductName(product.getName());
+        }
+        return items;
     }
     @Transactional
     public void updateShoppingListName(ShoppingList shoppingList) {
