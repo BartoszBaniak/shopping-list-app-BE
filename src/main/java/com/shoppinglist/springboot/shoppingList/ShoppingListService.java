@@ -123,6 +123,16 @@ public class ShoppingListService {
     public void updateShoppingListName(ShoppingList shoppingList) {
         shoppingListRepository.save(shoppingList);
     }
-
+    @Transactional
+    public void updateShoppingListStatus(Long shoppingListId, Status newStatus) {
+        Optional<ShoppingList> optionalShoppingList = shoppingListRepository.findById(shoppingListId);
+        if (optionalShoppingList.isPresent()) {
+            ShoppingList shoppingList = optionalShoppingList.get();
+            shoppingList.setStatus(newStatus);
+            shoppingListRepository.save(shoppingList);
+        } else {
+            throw new RuntimeException("Shopping list not found with id: " + shoppingListId);
+        }
+    }
 
 }

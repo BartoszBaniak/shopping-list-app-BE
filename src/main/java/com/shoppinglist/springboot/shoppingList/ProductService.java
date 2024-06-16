@@ -47,4 +47,5 @@ public class ProductService {
     }
 
     // Dodaj inne metody serwisu dotyczące produktów tutaj w zależności od potrzeb
+
 }
