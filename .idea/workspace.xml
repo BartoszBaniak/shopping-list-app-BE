@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9512f896-7ab6-48b2-a66e-2c0a638d9413" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/DataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/DataInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/keywordMapping/KeywordCategoryMappingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/keywordMapping/KeywordCategoryMappingService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ProductController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/shoppingList/ProductService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

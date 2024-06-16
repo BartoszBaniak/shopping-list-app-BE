@@ -42,6 +42,9 @@ public class ProductService {
         // Jeśli nie znaleziono pasującego mapowania, zwracamy domyślną kategorię
         return "Inne";
     }
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
 
     // Dodaj inne metody serwisu dotyczące produktów tutaj w zależności od potrzeb
 }
