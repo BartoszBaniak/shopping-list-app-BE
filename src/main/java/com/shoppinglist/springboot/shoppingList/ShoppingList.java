@@ -22,9 +22,14 @@ public class ShoppingList {
     @OneToMany(mappedBy = "shoppingList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShoppingListItem> items = new ArrayList<>();
 
+    @Column(name = "status")
+    private String status;
     // Gettery
     public Long getId() {
         return id;
+    }
+    public String getStatus() {
+        return status;
     }
 
     public String getName() {
@@ -54,5 +59,17 @@ public class ShoppingList {
 
     public void setItems(List<ShoppingListItem> items) {
         this.items = items;
+    }
+    public void setStatus(String status) {
+        // Validate if the status is one of the allowed values
+        if (!isValidStatus(status)) {
+            throw new IllegalArgumentException("Invalid status value");
+        }
+        this.status = status;
+    }
+
+    // Helper method to validate status
+    private boolean isValidStatus(String status) {
+        return status != null && (status.equals("Active") || status.equals("Trash") || status.equals("Deleted"));
     }
 }

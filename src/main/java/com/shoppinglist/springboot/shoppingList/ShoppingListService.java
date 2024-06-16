@@ -123,6 +123,9 @@ public class ShoppingListService {
     public void updateShoppingListName(ShoppingList shoppingList) {
         shoppingListRepository.save(shoppingList);
     }
-
+    @Transactional
+    public void updateShoppingListStatus(ShoppingList shoppingList) {
+        shoppingListRepository.save(shoppingList);
+    }
 
 }
