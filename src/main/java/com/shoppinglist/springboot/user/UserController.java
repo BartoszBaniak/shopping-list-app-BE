@@ -1,6 +1,6 @@
 package com.shoppinglist.springboot.user;
 
-import com.shoppinglist.springboot.MailService.MailService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +26,6 @@ import java.util.Map;
 public class UserController {
     private final UserService userService;
     private final TokenService tokenService;
-    @Autowired
-    MailService mailService;
     @Autowired
     UserRepository userRepository;
 

@@ -1,6 +1,6 @@
 package com.shoppinglist.springboot.user;
 
-import com.shoppinglist.springboot.MailService.MailService;
+
 import com.shoppinglist.springboot.Token.TokenRepository;
 import com.shoppinglist.springboot.Token.TokenResetRepository;
 import com.shoppinglist.springboot.Token.TokenService;
@@ -34,9 +34,6 @@ public class UserService {
     @Autowired
     TokenResetRepository tokenResetRepository;
     private static final long EXPIRATION_TIME_REFRESH = 3600000 * 24;
-
-    @Autowired
-    MailService mailService;
     @Autowired
     TokenService tokenService;
     @Autowired

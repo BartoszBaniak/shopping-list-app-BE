@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9512f896-7ab6-48b2-a66e-2c0a638d9413" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shoppinglist/springboot/CorsConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/shoppinglist/springboot/shoppingList/ShoppingListController.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
