@@ -14,7 +14,7 @@ public class UserJPADataAccessService implements UserDAO {
     }
 
     @Override
-    public List < User > getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
@@ -24,12 +24,12 @@ public class UserJPADataAccessService implements UserDAO {
     }
 
     @Override
-    public Optional < User > getUserById(String id) {
+    public Optional<User> getUserById(String id) {
         return userRepository.findById(id);
     }
 
     @Override
-    public Optional < User > getUserByEmail(String email) {
+    public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
@@ -49,7 +49,7 @@ public class UserJPADataAccessService implements UserDAO {
     }
 
     @Override
-    public Optional < User > getById(String userId) {
+    public Optional<User> getById(String userId) {
         return userRepository.findById(userId);
     }
 

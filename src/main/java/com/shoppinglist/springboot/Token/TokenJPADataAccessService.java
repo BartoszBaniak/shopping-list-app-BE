@@ -26,6 +26,7 @@ public class TokenJPADataAccessService implements TokenDAO {
     public Optional<Token> getTokenByContent(String token) {
         return tokenRepository.findByContent(token);
     }
+
     public void deleteByContent(String tokenContent) {
         tokenRepository.deleteByContent(tokenContent);
     }
@@ -33,6 +34,5 @@ public class TokenJPADataAccessService implements TokenDAO {
     public void deleteAllTokens(String userID) {
         tokenRepository.deleteAllByUserID(userID);
     }
-
 
 }

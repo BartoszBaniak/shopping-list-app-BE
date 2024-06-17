@@ -1,15 +1,16 @@
 package com.shoppinglist.springboot.keywordMapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shoppinglist.springboot.shoppingList.Product;
 import com.shoppinglist.springboot.shoppingList.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class KeywordCategoryMappingService {
@@ -35,12 +36,10 @@ public class KeywordCategoryMappingService {
             mappings.forEach((keyword, category) -> {
                 Optional<KeywordCategoryMapping> existingMapping = keywordCategoryMappingRepository.findByKeyword(keyword);
                 if (existingMapping.isPresent()) {
-                    // Jeśli keyword już istnieje, zaktualizuj kategorię
                     KeywordCategoryMapping mapping = existingMapping.get();
                     mapping.setCategory(category);
                     keywordCategoryMappingRepository.save(mapping);
                 } else {
-                    // Jeśli keyword nie istnieje, dodaj nowy rekord
                     KeywordCategoryMapping mapping = new KeywordCategoryMapping();
                     mapping.setKeyword(keyword);
                     mapping.setCategory(category);
@@ -52,6 +51,7 @@ public class KeywordCategoryMappingService {
             e.printStackTrace();
         }
     }
+
     @Transactional
     public void saveProductFromJsonFile() {
         try {
@@ -62,7 +62,6 @@ public class KeywordCategoryMappingService {
             Map<String, String> mappings = (Map<String, String>) jsonData.get("keywords");
 
             mappings.forEach((keyword, category) -> {
-                // Handle KeywordCategoryMapping
                 Optional<KeywordCategoryMapping> existingMapping = keywordCategoryMappingRepository.findByKeyword(keyword);
                 if (existingMapping.isPresent()) {
                     KeywordCategoryMapping mapping = existingMapping.get();
@@ -75,7 +74,6 @@ public class KeywordCategoryMappingService {
                     keywordCategoryMappingRepository.save(mapping);
                 }
 
-                // Handle Product
                 Optional<Product> existingProduct = productRepository.findByName(keyword);
                 if (existingProduct.isPresent()) {
                     Product product = existingProduct.get();

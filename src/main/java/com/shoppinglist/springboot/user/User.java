@@ -1,9 +1,7 @@
 package com.shoppinglist.springboot.user;
 
 import jakarta.persistence.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
@@ -31,7 +29,8 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String firstname, String lastname, String email, String password) {
         this.firstname = firstname;
@@ -79,8 +78,6 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
-
 
     @Override
     public boolean equals(Object o) {

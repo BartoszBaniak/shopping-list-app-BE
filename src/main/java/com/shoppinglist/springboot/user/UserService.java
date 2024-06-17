@@ -1,35 +1,28 @@
 package com.shoppinglist.springboot.user;
 
-
 import com.shoppinglist.springboot.Token.TokenRepository;
 import com.shoppinglist.springboot.Token.TokenResetRepository;
 import com.shoppinglist.springboot.Token.TokenService;
 import com.shoppinglist.springboot.exceptions.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.MediaType;
-import java.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-
-import org.springframework.mail.javamail.JavaMailSender;
-
-
 
 @Service
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserDAO userDAO;
-
 
     @Autowired
     TokenResetRepository tokenResetRepository;
@@ -48,7 +41,7 @@ public class UserService {
         this.tokenService = tokenService;
     }
 
-    public List < User > getAllUsers() {
+    public List<User> getAllUsers() {
         return userDAO.getAllUsers();
     }
 
@@ -66,7 +59,7 @@ public class UserService {
                 );
     }
 
-    private ResponseEntity < ? > checkEmailExists(String email) {
+    private ResponseEntity<?> checkEmailExists(String email) {
         if (userDAO.existsUserWithEmail(email)) {
             logger.warn("Email already exists");
             ApiError error = new ApiError("Validation", "email", "Email already exists");
@@ -75,7 +68,7 @@ public class UserService {
         return ResponseEntity.ok("Email checked.");
     }
 
-    public ResponseEntity < ? > passwordValidator(String password, String retPassword) {
+    public ResponseEntity<?> passwordValidator(String password, String retPassword) {
         if (password.length() < 8 || password.length() > 32) {
             ApiError error = new ApiError("Validation", "password", "Password length should be between 8 and 32 characters");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -107,7 +100,7 @@ public class UserService {
         return ResponseEntity.ok("password is approved.");
     }
 
-    private ResponseEntity < ? > checkFullName(String firstname, String lastname) {
+    private ResponseEntity<?> checkFullName(String firstname, String lastname) {
         if (firstname.length() > 50) {
             logger.warn("Invalid firstname");
             ApiError error = new ApiError("Validation", "firstname", "Invalid firstname");
@@ -121,14 +114,13 @@ public class UserService {
         return ResponseEntity.ok("fullname checked.");
     }
 
-
-    public ResponseEntity < ? > addUser(UserRegistrationRequest userRegistrationRequest) {
+    public ResponseEntity<?> addUser(UserRegistrationRequest userRegistrationRequest) {
         final String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" +
                 "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-        if (userRegistrationRequest.firstName() == null || userRegistrationRequest.firstName() == "" || userRegistrationRequest.lastName() == ""
-                || userRegistrationRequest.lastName() == null || userRegistrationRequest.email() == null || userRegistrationRequest.email() == ""
-                || userRegistrationRequest.password() == null || userRegistrationRequest.password() == ""
-                || userRegistrationRequest.retPassword() == null || userRegistrationRequest.retPassword() == "") {
+        if (userRegistrationRequest.firstName() == null || userRegistrationRequest.firstName() == "" || userRegistrationRequest.lastName() == "" ||
+                userRegistrationRequest.lastName() == null || userRegistrationRequest.email() == null || userRegistrationRequest.email() == "" ||
+                userRegistrationRequest.password() == null || userRegistrationRequest.password() == "" ||
+                userRegistrationRequest.retPassword() == null || userRegistrationRequest.retPassword() == "") {
             logger.warn("Missing data");
             ApiError error = new ApiError("Validation", null, "Missing data");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -140,28 +132,26 @@ public class UserService {
         String retPassword = userRegistrationRequest.retPassword();
         ZonedDateTime currentZonedDateTime = ZonedDateTime.now();
 
-
         if (!checkEmailValid(email, regexPattern) || email.length() > 255) {
             logger.warn("Invalid email");
             ApiError error = new ApiError("Validation", "email", "Invalid email");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
-        ResponseEntity < ? > checkFullNameResult = checkFullName(firstname, lastname);
+        ResponseEntity<?> checkFullNameResult = checkFullName(firstname, lastname);
         if (checkFullNameResult.getStatusCode() != HttpStatus.OK) {
             return checkFullNameResult;
         }
-        ResponseEntity < ? > passwordValidationResult = passwordValidator(password, retPassword);
+        ResponseEntity<?> passwordValidationResult = passwordValidator(password, retPassword);
         if (passwordValidationResult.getStatusCode() != HttpStatus.OK) {
             logger.warn("Invalid password");
             return passwordValidationResult;
         }
-        ResponseEntity < ? > checkEmailExistsResult = checkEmailExists(email);
+        ResponseEntity<?> checkEmailExistsResult = checkEmailExists(email);
         if (checkEmailExistsResult.getStatusCode() != HttpStatus.OK) {
             logger.warn("Email already in database");
             return checkEmailExistsResult;
         }
 
-        //Encrypting password
         String generatedSecuredPasswordHash = BCrypt.hashpw(password, BCrypt.gensalt(12));
         User user = new User(firstname, lastname, email, generatedSecuredPasswordHash);
         userDAO.addUser(user);
@@ -171,17 +161,14 @@ public class UserService {
         return ResponseEntity.ok("Account activated successfully.");
     }
 
-
-
-
     private boolean checkEmailValid(String email, String emailRegex) {
         return Pattern.compile(emailRegex)
                 .matcher(email)
                 .matches();
     }
 
-    public ResponseEntity < ? > updateUser(String uuid, UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
-        ResponseEntity < ? > checkAuthorizationResult = checkAuthorization(request);
+    public ResponseEntity<?> updateUser(String uuid, UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
+        ResponseEntity<?> checkAuthorizationResult = checkAuthorization(request);
         if (checkAuthorizationResult.getStatusCode() != HttpStatus.OK) {
             ApiError error = new ApiError("General", null, "Missing authorization");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
@@ -191,7 +178,6 @@ public class UserService {
                         new ResourceNotFoundException("Customer with id [%s] not found".formatted(uuid))
                 );
         var userId = getUserIDFromAccessToken(request);
-        //uuid - id of requested user, userId - id of user logged in
         if (!uuid.equals(userId)) {
             ApiError error = new ApiError("Access", null, "Access denied");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
@@ -215,7 +201,6 @@ public class UserService {
         return expiryDateTime.isAfter(currentDateTime);
     }
 
-
     private String getFileExtension(String filename) {
         int lastDotIndex = filename.lastIndexOf('.');
         if (lastDotIndex != -1) {
@@ -224,8 +209,7 @@ public class UserService {
         return null;
     }
 
-
-    public ResponseEntity < ? > checkAuthorization(HttpServletRequest request) {
+    public ResponseEntity<?> checkAuthorization(HttpServletRequest request) {
         if (checkAuthorizationHeader(request)) {
             try {
                 if (checkLoggedUser(request)) {
@@ -246,19 +230,14 @@ public class UserService {
 
     boolean checkAuthorizationHeader(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            return true;
-        }
-        return false;
+        return authorizationHeader != null && authorizationHeader.startsWith("Bearer ");
     }
 
     boolean checkLoggedUser(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String jwtToken = authorizationHeader.substring(7);
-            if (tokenService.validateAccessToken(jwtToken)) {
-                return true;
-            }
+            return tokenService.validateAccessToken(jwtToken);
         }
         return false;
     }
@@ -274,9 +253,8 @@ public class UserService {
         return null;
     }
 
-    public ResponseEntity < ? > getUserDetails(String uuid, UserService userService, HttpServletRequest request) {
-        //Check if user is logged in
-        ResponseEntity < ? > checkAuthorizationResult = checkAuthorization(request);
+    public ResponseEntity<?> getUserDetails(String uuid, UserService userService, HttpServletRequest request) {
+        ResponseEntity<?> checkAuthorizationResult = checkAuthorization(request);
         if (checkAuthorizationResult.getStatusCode() != HttpStatus.OK) {
             ApiError error = new ApiError("General", null, "Missing authorization");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
@@ -284,7 +262,6 @@ public class UserService {
         var user = userService.getUserById(uuid);
         var userId = userService.getUserIDFromAccessToken(request);
         var userDTO = new UserDTO(user.getId(), user.getFirstname(), user.getLastname(), user.getEmail());
-        //uuid - id of requested user, userId - id of user logged in
         if (!uuid.equals(userId)) {
             userDTO.setEmail(null);
         }
@@ -293,12 +270,4 @@ public class UserService {
                 .body(userDTO);
     }
 
-    public void deleteUser1(String id) {
-        User user = userDAO.getUserById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Customer with id [%s] not found".formatted(id))
-                );
-
-        userDAO.deleteUser(user);
-    }
 }

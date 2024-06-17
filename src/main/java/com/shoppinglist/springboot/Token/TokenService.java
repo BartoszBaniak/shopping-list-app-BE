@@ -1,15 +1,17 @@
 package com.shoppinglist.springboot.Token;
 
-import com.shoppinglist.springboot.user.User;
-import com.shoppinglist.springboot.exceptions.ResourceNotFoundException;
 import com.shoppinglist.springboot.exceptions.NotValidResourceException;
+import com.shoppinglist.springboot.exceptions.ResourceNotFoundException;
 import com.shoppinglist.springboot.user.ApiError;
+import com.shoppinglist.springboot.user.User;
 import com.shoppinglist.springboot.user.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -19,8 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import java.security.Key;
@@ -66,17 +66,13 @@ public class TokenService {
         return token;
     }
 
-    public ResponseEntity < ? > loginUser(String email, String password, UserService userService) {
+    public ResponseEntity<?> loginUser(String email, String password, UserService userService) {
         try {
             User user = userService.getUserByEmail(email);
-            // checking password
             if (BCrypt.checkpw(password, user.getPassword())) {
-                // generating tokens
                 String accessToken = generateToken(EXPIRATION_TIME_ACCESS, user.getId());
                 String refreshToken = generateToken(EXPIRATION_TIME_REFRESH, user.getId());
-                // adding refresh token to database
                 addToken(user.getId(), refreshToken);
-                // adding refresh token to cookies
                 Cookie cookie = new Cookie("refreshToken", refreshToken);
                 cookie.setHttpOnly(true);
                 cookie.setPath("/api/auth");
@@ -96,17 +92,13 @@ public class TokenService {
         }
     }
 
-    public ResponseEntity < ? > refreshToken(String refreshToken) {
+    public ResponseEntity<?> refreshToken(String refreshToken) {
         if (!refreshToken.isEmpty()) {
             try {
                 Claims claims = Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(refreshToken).getBody();
-                // getting userID from refresh token
                 String userID = claims.getSubject();
-                // getting refresh token from database
                 Token dataBaseRefreshToken = getTokenByContent(refreshToken);
-                // checking refresh token
                 if (dataBaseRefreshToken.getContent().equals(refreshToken) && dataBaseRefreshToken.getUserID().equals(userID)) {
-                    // Creating new access token
                     String accessToken = generateToken(EXPIRATION_TIME_ACCESS, userID);
                     return ResponseEntity.ok().body(accessToken);
                 } else {
@@ -114,16 +106,13 @@ public class TokenService {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
                 }
             } catch (ExpiredJwtException e) {
-                // token unnactive
                 ApiError error = new ApiError("Refresh", null, "Expired token");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
             } catch (ResourceNotFoundException e) {
-                // token not in database
                 ApiError error = new ApiError("Refresh", null, "token not in database");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
             }
         } else {
-            // Cookie refreshToken not found
             ApiError error = new ApiError("Refresh", null, "Empty cookie");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
@@ -169,7 +158,6 @@ public class TokenService {
     }
 
     public void logoutAllSessions(String userId, HttpHeaders headers) {
-        // Usunięcie wszystkich tokenów użytkownika z bazy danych
         deleteAllTokens(userId);
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")

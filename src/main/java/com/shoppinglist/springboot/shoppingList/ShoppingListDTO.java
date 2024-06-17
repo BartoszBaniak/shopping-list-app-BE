@@ -28,5 +28,5 @@ public class ShoppingListDTO {
     public void setStatus(String status) {
         this.status = status;
     }
-    // Dodaj gettery i settery dla innych pól według potrzeb
+
 }

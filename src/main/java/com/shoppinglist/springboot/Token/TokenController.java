@@ -1,15 +1,15 @@
 package com.shoppinglist.springboot.Token;
 
-import com.shoppinglist.springboot.user.User;
 import com.shoppinglist.springboot.user.ApiError;
+import com.shoppinglist.springboot.user.User;
 import com.shoppinglist.springboot.user.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("api/auth")
@@ -28,7 +28,7 @@ public class TokenController {
     }
 
     @PostMapping("login")
-    public ResponseEntity < ? > login(@RequestBody LoginRequest requestBody) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest requestBody) {
         if ((requestBody.email() == null && requestBody.password() == null) || (requestBody.email() == "" && requestBody.password() == "")) {
             logger.warn("Missing e-mail and password");
             ApiError error = new ApiError("Validation", "Both", "Missing data");
@@ -48,7 +48,7 @@ public class TokenController {
     }
 
     @GetMapping("refresh")
-    public ResponseEntity < ? > refresh(@CookieValue(value = "refreshToken", defaultValue = "") String refreshToken) {
+    public ResponseEntity<?> refresh(@CookieValue(value = "refreshToken", defaultValue = "") String refreshToken) {
         if (refreshToken == null) {
             ApiError error = new ApiError("Refresh", null, "No token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
@@ -58,13 +58,10 @@ public class TokenController {
     }
 
     @DeleteMapping("logout")
-    public ResponseEntity < ? > logout(@CookieValue(value = "refreshToken", defaultValue = "") String refreshToken) {
+    public ResponseEntity<?> logout(@CookieValue(value = "refreshToken", defaultValue = "") String refreshToken) {
         if (!refreshToken.isEmpty()) {
             try {
-                // Usuwanie tokenu
                 tokenService.deleteToken(refreshToken);
-
-                // Tworzenie ciasteczka z przeterminowaną datą
                 ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                         .httpOnly(true)
                         .secure(true)
@@ -72,7 +69,6 @@ public class TokenController {
                         .maxAge(0)
                         .build();
 
-                // Usuwanie ciasteczka
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
 
@@ -84,18 +80,16 @@ public class TokenController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
             }
         } else {
-            // Brak ciasteczka
             ApiError error = new ApiError("logout", "", "missing cookie");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
 
     @DeleteMapping("logout-all")
-    public ResponseEntity < ? > logoutAll(@CookieValue(value = "refreshToken", defaultValue = "") String refreshToken) {
+    public ResponseEntity<?> logoutAll(@CookieValue(value = "refreshToken", defaultValue = "") String refreshToken) {
         if (!refreshToken.isEmpty()) {
             try {
                 String userId = tokenService.getUserIdFromToken(refreshToken);
-                // Usunięcie wszystkich tokenów użytkownika z bazy danych
                 tokenService.deleteAllTokens(userId);
 
                 ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
@@ -105,7 +99,6 @@ public class TokenController {
                         .maxAge(0)
                         .build();
 
-                // Usuwanie ciasteczka
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
 

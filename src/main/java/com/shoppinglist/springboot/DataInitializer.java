@@ -5,7 +5,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class DataInitializer implements ApplicationRunner {
 
@@ -21,7 +20,6 @@ public class DataInitializer implements ApplicationRunner {
             keywordCategoryMappingService.saveMappingsFromJsonFile();
             keywordCategoryMappingService.saveProductFromJsonFile();
         } catch (Exception e) {
-            // Obsługa błędów, jeśli wystąpią problemy podczas wczytywania danych z pliku JSON
             e.printStackTrace();
         }
     }
