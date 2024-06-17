@@ -1,6 +1,7 @@
 package com.shoppinglist.springboot.Token;
 
 import jakarta.persistence.*;
+
 import java.util.Objects;
 
 @Entity
@@ -63,10 +64,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" +
-                "id=" + id +
-                ", userID=" + userID +
-                ", content='" + content + '\'' +
-                '}';
+        return "Token{" + "id=" + id + ", userID=" + userID + ", content='" + content + '\'' + '}';
     }
 }

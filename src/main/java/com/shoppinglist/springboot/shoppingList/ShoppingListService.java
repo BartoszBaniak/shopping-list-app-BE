@@ -1,14 +1,14 @@
 package com.shoppinglist.springboot.shoppingList;
 
+import com.shoppinglist.springboot.keywordMapping.KeywordCategoryMappingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.shoppinglist.springboot.keywordMapping.KeywordCategoryMappingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ShoppingListService {
@@ -51,7 +51,7 @@ public class ShoppingListService {
             newItem.setProduct(product);
             newItem.setShoppingList(shoppingList);
             newItem.setPurchased(false);
-            newItem.setQuantity(quantity); // Ustawienie ilości produktu
+            newItem.setQuantity(quantity);
             shoppingList.getItems().add(newItem);
         }
 
@@ -87,23 +87,22 @@ public class ShoppingListService {
 
     @Transactional
     public void deleteProductsFromList(ShoppingList shoppingList, List<String> productNames) throws Exception {
-        // Pobierz listę elementów
         List<ShoppingListItem> items = shoppingList.getItems();
 
-        // Usuń produkty, które są na liście productNames
         boolean found = items.removeIf(item -> productNames.contains(item.getProduct().getName()));
 
         if (!found) {
             throw new Exception("One or more products specified for deletion are not present in the shopping list");
         }
 
-        // Zapisz zaktualizowaną listę zakupów
         shoppingListRepository.save(shoppingList);
     }
+
     @Transactional
     public void deleteShoppingList(ShoppingList shoppingList) {
         shoppingListRepository.delete(shoppingList);
     }
+
     public List<ShoppingListDTO> findShoppingListsByUserId(String userId) {
         List<ShoppingList> shoppingLists = shoppingListRepository.findByUserId(userId);
         List<ShoppingListDTO> shoppingListDTOs = new ArrayList<>();
@@ -111,18 +110,20 @@ public class ShoppingListService {
             ShoppingListDTO shoppingListDTO = new ShoppingListDTO();
             shoppingListDTO.setId(shoppingList.getId());
             shoppingListDTO.setName(shoppingList.getName());
-            // Ustaw inne pola według potrzeb
             shoppingListDTOs.add(shoppingListDTO);
         }
         return shoppingListDTOs;
     }
+
     public List<ShoppingListItem> findAllItemsByShoppingListId(Long shoppingListId) {
         return shoppingListItemRepository.findAllByShoppingListId(shoppingListId);
     }
+
     @Transactional
     public void updateShoppingListName(ShoppingList shoppingList) {
         shoppingListRepository.save(shoppingList);
     }
+
     @Transactional
     public void updateShoppingListStatus(ShoppingList shoppingList) {
         shoppingListRepository.save(shoppingList);
@@ -134,6 +135,16 @@ public class ShoppingListService {
             return shoppingList.getStatus();
         } else {
             // Możesz rzucić wyjątek lub obsłużyć brak listy zakupów
+            throw new IllegalArgumentException("Shopping list with ID " + shoppingListId + " not found");
+        }
+    }
+
+    public String getShoppingListStatus(Long shoppingListId) {
+        Optional<ShoppingList> optionalShoppingList = shoppingListRepository.findById(shoppingListId);
+        if (optionalShoppingList.isPresent()) {
+            ShoppingList shoppingList = optionalShoppingList.get();
+            return shoppingList.getStatus();
+        } else {
             throw new IllegalArgumentException("Shopping list with ID " + shoppingListId + " not found");
         }
     }

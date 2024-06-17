@@ -1,11 +1,10 @@
 package com.shoppinglist.springboot.shoppingList;
 
-import com.shoppinglist.springboot.keywordMapping.KeywordCategoryMapping;
-import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.List;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 @Entity
 public class Product {
     @Id

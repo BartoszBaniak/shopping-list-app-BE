@@ -1,10 +1,10 @@
 package com.shoppinglist.springboot.shoppingList;
 
+import com.shoppinglist.springboot.user.User;
 import jakarta.persistence.*;
 
-import java.util.*;
-
-import com.shoppinglist.springboot.user.User;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "shopping_lists")
@@ -24,51 +24,50 @@ public class ShoppingList {
 
     @Column(name = "status")
     private String status;
-    // Gettery
+
     public Long getId() {
         return id;
     }
-    public String getStatus() {
-        return status;
-    }
 
-    public String getName() {
-        return name;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public List<ShoppingListItem> getItems() {
-        return items;
-    }
-
-    // Settery
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getStatus() {
+        return status;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public void setItems(List<ShoppingListItem> items) {
-        this.items = items;
-    }
     public void setStatus(String status) {
-        // Validate if the status is one of the allowed values
         if (!isValidStatus(status)) {
             throw new IllegalArgumentException("Invalid status value");
         }
         this.status = status;
     }
 
-    // Helper method to validate status
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<ShoppingListItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ShoppingListItem> items) {
+        this.items = items;
+    }
+
     private boolean isValidStatus(String status) {
         return status != null && (status.equals("Active") || status.equals("Trash") || status.equals("Deleted"));
     }

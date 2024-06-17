@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserDAO {
-    List < User > getAllUsers();
+    List<User> getAllUsers();
 
     void addUser(User user);
 
     Optional<User> getUserById(String id);
 
-    Optional < User > getUserByEmail(String email);
+    Optional<User> getUserByEmail(String email);
 
     boolean existsUserWithEmail(String email);
 

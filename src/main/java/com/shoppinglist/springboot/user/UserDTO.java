@@ -1,16 +1,11 @@
 package com.shoppinglist.springboot.user;
 
-import jakarta.annotation.Nullable;
-
-import java.time.LocalDate;
-
 public class UserDTO {
 
-    private String id;
-    private String firstName;
-    private String lastName;
+    private final String id;
+    private final String firstName;
+    private final String lastName;
     private String email;
-
 
     public UserDTO(String id, String firstname, String lastname, String email) {
         this.id = id;

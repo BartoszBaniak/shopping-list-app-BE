@@ -1,6 +1,5 @@
 package com.shoppinglist.springboot.shoppingList;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 
 @Entity
@@ -19,44 +18,43 @@ public class ShoppingListItem {
 
     private boolean purchased;
 
-    private int quantity; // Dodane pole quantity
+    private int quantity;
 
-    // Gettery
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Product getProduct() {
         return product;
     }
 
-    public ShoppingList getShoppingList() {
-        return shoppingList;
-    }
-
-    public boolean isPurchased() {
-        return purchased;
-    }
-
-    public int getQuantity() { // Getter dla quantity
-        return quantity;
-    }
-
-    // Settery
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public ShoppingList getShoppingList() {
+        return shoppingList;
     }
 
     public void setShoppingList(ShoppingList shoppingList) {
         this.shoppingList = shoppingList;
     }
 
+    public boolean isPurchased() {
+        return purchased;
+    }
+
     public void setPurchased(boolean purchased) {
         this.purchased = purchased;
+    }
+
+    public int getQuantity() { // Getter dla quantity
+        return quantity;
     }
 
     public void setQuantity(int quantity) { // Setter dla quantity
